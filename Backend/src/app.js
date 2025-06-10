@@ -1,0 +1,47 @@
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const sequelize = require("./configuracion/basededatos");
+const authRutas = require("./rutas/auth");
+const vehiculosRoutes = require("./rutas/vehiculos");
+const rutasRoutes = require("./rutas/rutas");
+const solicitudesRoutes = require("./rutas/solicitudes");
+const cargasRoutes = require("./rutas/cargas");
+const asignacionesRoutes = require("./rutas/asignaciones");
+const reportesRoutes = require("./rutas/reportes");
+// Importar los modelos para que Sequelize los registre
+require("./modelos/Usuario"); // Haz lo mismo con los otros modelos cuando los crees
+require("./modelos/Vehiculo");
+require("./modelos/Ruta");
+require("./modelos/Solicitud");
+require("./modelos/Carga");
+require("./modelos/Asignacion");
+require("./modelos/Reporte");
+const app = express();
+
+app.use(express.json());
+app.use(cors());
+app.use(morgan("dev"));
+app.use("/api/auth", authRutas);
+app.use("/api", vehiculosRoutes);
+app.use("/api", rutasRoutes);
+app.use("/api", solicitudesRoutes);
+app.use("/api", cargasRoutes);
+app.use("/api", asignacionesRoutes);
+app.use("/api", reportesRoutes);
+
+const PUERTO = process.env.PUERTO || 3000;
+
+// Sincroniza los modelos y arranca el servidor
+sequelize
+  .sync({ alter: true }) // Esto eliminará y recreará las tablas
+  .then(() => {
+    console.log("Base de datos sincronizada correctamente.");
+    app.listen(5000, () => {
+      console.log("Servidor corriendo en http://localhost:5000");
+    });
+  })
+  .catch((error) => {
+    console.error("Error sincronizando la base de datos:", error);
+  });

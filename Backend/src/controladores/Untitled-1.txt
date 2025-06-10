@@ -1,0 +1,5 @@
+fetch("/api/vehiculos", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
