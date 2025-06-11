@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 // Registrar usuario (puedes enviar el rol desde el frontend si lo deseas)
 exports.registrar = async (req, res) => {
   try {
-    const { usuario, contrasena, nombre, correo, rol = "cliente" } = req.body;
+    const { usuario, contrasena, nombre, correo } = req.body; // rol eliminado aquí
     if (!usuario || !contrasena || !nombre || !correo)
       return res.status(400).json({ mensaje: "Faltan datos." });
 
@@ -21,18 +21,20 @@ exports.registrar = async (req, res) => {
     // Encripta la contraseña
     const hash = await bcrypt.hash(contrasena, 10);
 
-    // Crea el usuario
+    // Crea el usuario, siempre como cliente
     const nuevoUsuario = await Usuario.create({
       usuario,
       contrasena: hash,
       nombre,
       correo,
-      rol,
+      rol: "cliente", // <-- Forzar rol cliente aquí
     });
 
     res.status(201).json({ mensaje: "Usuario registrado correctamente." });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error en el servidor.", error: error.message });
+    res
+      .status(500)
+      .json({ mensaje: "Error en el servidor.", error: error.message });
   }
 };
 

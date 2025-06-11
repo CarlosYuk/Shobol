@@ -20,7 +20,7 @@ const RegisterModal = ({ onClose }) => {
     confirmPassword: "",
     nombre: "",
     correo: "",
-    rol: USER_ROLES.CLIENT,
+    // rol eliminado del estado
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -56,7 +56,7 @@ const RegisterModal = ({ onClose }) => {
 
     try {
       const { confirmPassword, ...dataToSend } = formData;
-      await register(dataToSend);
+      await register({ ...dataToSend, rol: "cliente" }); // <-- Forzar rol cliente
       setSuccess(true);
       setTimeout(() => {
         onClose();
@@ -164,23 +164,6 @@ const RegisterModal = ({ onClose }) => {
                   placeholder="juan@empresa.com"
                 />
               </div>
-            </div>
-
-            {/* Rol */}
-            <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">
-                Tipo de Usuario
-              </label>
-              <select
-                name="rol"
-                value={formData.rol}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              >
-                <option value={USER_ROLES.CLIENT}>Cliente</option>
-                <option value={USER_ROLES.GESTOR}>Gestor</option>
-                <option value={USER_ROLES.ADMIN}>Administrador</option>
-              </select>
             </div>
 
             {/* Password */}
