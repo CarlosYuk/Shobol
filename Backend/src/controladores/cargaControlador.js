@@ -1,4 +1,4 @@
-const Carga = require("../modelos/Carga");
+/* const Carga = require("../modelos/Carga");
 
 // Listar cargas
 exports.listar = async (req, res) => {
@@ -65,3 +65,4 @@ exports.eliminar = async (req, res) => {
       .json({ mensaje: "Error al eliminar carga", error: error.message });
   }
 };
+ */

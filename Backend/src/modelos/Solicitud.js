@@ -14,7 +14,7 @@ const Solicitud = sequelize.define(
     },
     estado: {
       type: DataTypes.STRING,
-      allowNull: false, // 'pendiente', 'en_proceso', 'completada'
+      defaultValue: "pendiente",
     },
     observaciones: {
       type: DataTypes.TEXT,
@@ -23,9 +23,7 @@ const Solicitud = sequelize.define(
   },
   {
     tableName: "solicitudes",
-    timestamps: true,
-    createdAt: "creado_en",
-    updatedAt: false,
+    timestamps: false,
   }
 );
 

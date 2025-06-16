@@ -21,18 +21,19 @@ import {
 const Sidebar = () => {
   const { user } = useAuth();
 
-  const getNavigationItems = () => {
-    const baseItems = [
-      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    ];
+  const baseItems = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  ];
 
+  const getNavigationItems = () => {
     switch (user?.rol) {
       case USER_ROLES.ADMIN:
         return [
           ...baseItems,
-          { name: "Usuarios", href: "/users", icon: Users },
+          { name: "Usuarios", href: "/dashboard/usuarios", icon: Users },
+          { name: "Solicitudes", href: "/dashboard/requests", icon: FileText },
+          { name: "Pedidos", href: "/dashboard/pedidos", icon: ClipboardList },
           { name: "Asignaciones", href: "/assignments", icon: ClipboardList },
-          { name: "Solicitudes", href: "/requests", icon: FileText },
           { name: "Cargas", href: "/loads", icon: Box },
           { name: "Rutas", href: "/routes", icon: Route },
           { name: "Vehículos", href: "/vehicles", icon: Truck },
@@ -42,8 +43,10 @@ const Sidebar = () => {
       case USER_ROLES.GESTOR:
         return [
           ...baseItems,
+          { name: "Usuarios", href: "/dashboard/usuarios", icon: Users },
+          { name: "Solicitudes", href: "/dashboard/requests", icon: FileText },
+          { name: "Pedidos", href: "/dashboard/pedidos", icon: ClipboardList },
           { name: "Asignaciones", href: "/assignments", icon: ClipboardList },
-          { name: "Solicitudes", href: "/requests", icon: FileText },
           { name: "Cargas", href: "/loads", icon: Box },
           { name: "Rutas", href: "/routes", icon: Route },
           { name: "Vehículos", href: "/vehicles", icon: Truck },
@@ -54,9 +57,13 @@ const Sidebar = () => {
         return [
           ...baseItems,
           { name: "Mis Solicitudes", href: "/my-requests", icon: FileText },
+          {
+            name: "Nueva Solicitud",
+            href: "/dashboard/nueva-solicitud",
+            icon: Plus,
+          },
           { name: "Mis Envíos", href: "/my-shipments", icon: Package },
           { name: "Seguimiento", href: "/tracking", icon: MapPin },
-          { name: "Nueva Solicitud", href: "/new-request", icon: Plus },
           { name: "Historial", href: "/history", icon: BarChart3 },
         ];
       default:

@@ -82,3 +82,20 @@ exports.login = async (req, res) => {
       .json({ mensaje: "Error en el servidor.", error: error.message });
   }
 };
+
+// Listar usuarios (admin ve todos, gestor solo clientes)
+exports.listarUsuarios = async (req, res) => {
+  try {
+    const { rol } = req.usuario; // <--- aquí
+    let where = {};
+    if (rol === "gestor") where = { rol: "cliente" };
+    // Admin ve todos
+    const usuarios = await Usuario.findAll({
+      where,
+      attributes: { exclude: ["contrasena"] },
+    });
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ mensaje: "Error al obtener usuarios." });
+  }
+};

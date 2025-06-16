@@ -1,4 +1,4 @@
-const express = require("express");
+/* const express = require("express");
 const router = express.Router();
 const cargaCtrl = require("../controladores/cargaControlador");
 const {
@@ -20,3 +20,4 @@ router.put("/cargas/:id", verificarToken, cargaCtrl.editar);
 router.delete("/cargas/:id", verificarToken, soloAdmin, cargaCtrl.eliminar);
 
 module.exports = router;
+ */

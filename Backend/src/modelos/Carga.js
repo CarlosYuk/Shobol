@@ -1,4 +1,4 @@
-const { DataTypes } = require("sequelize");
+/* const { DataTypes } = require("sequelize");
 const sequelize = require("../configuracion/basededatos");
 
 const Carga = sequelize.define(
@@ -26,3 +26,4 @@ const Carga = sequelize.define(
 );
 
 module.exports = Carga;
+ */

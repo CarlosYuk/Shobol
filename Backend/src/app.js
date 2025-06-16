@@ -3,19 +3,21 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const sequelize = require("./configuracion/basededatos");
+const usuariosRoutes = require("./rutas/usuarios");
 const authRutas = require("./rutas/auth");
 const vehiculosRoutes = require("./rutas/vehiculos");
 const rutasRoutes = require("./rutas/rutas");
-const solicitudesRoutes = require("./rutas/solicitudes");
-const cargasRoutes = require("./rutas/cargas");
+const solicitudesRouter = require('./rutas/solicitudes');
+//const cargasRoutes = require("./rutas/cargas");
 const asignacionesRoutes = require("./rutas/asignaciones");
 const reportesRoutes = require("./rutas/reportes");
+const pedidosRoutes = require("./rutas/pedidos");
 // Importar los modelos para que Sequelize los registre
 require("./modelos/Usuario"); // Haz lo mismo con los otros modelos cuando los crees
 require("./modelos/Vehiculo");
 require("./modelos/Ruta");
 require("./modelos/Solicitud");
-require("./modelos/Carga");
+//require("./modelos/Carga");
 require("./modelos/Asignacion");
 require("./modelos/Reporte");
 const app = express();
@@ -23,13 +25,16 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
+
 app.use("/api/auth", authRutas);
+app.use("/api", usuariosRoutes);
 app.use("/api", vehiculosRoutes);
 app.use("/api", rutasRoutes);
-app.use("/api", solicitudesRoutes);
-app.use("/api", cargasRoutes);
+app.use('/api/solicitudes', solicitudesRouter);
+//app.use("/api", cargasRoutes);
 app.use("/api", asignacionesRoutes);
 app.use("/api", reportesRoutes);
+app.use("/api", pedidosRoutes);
 
 const PUERTO = process.env.PUERTO || 3000;
 

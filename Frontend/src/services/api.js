@@ -115,6 +115,42 @@ class ApiService {
   async deleteUser(id) {
     return this.delete(`/usuarios/${id}`);
   }
+
+  async createSolicitud(data) {
+    return this.post("/solicitudes", data);
+  }
+
+  async createPedido(data) {
+    return this.post("/pedidos", data);
+  }
+
+  async getPedidos() {
+    return this.get("/pedidos");
+  }
+
+  async asignarVehiculoPedido(id, vehiculo_id) {
+    return this.put(`/pedidos/${id}/asignar-vehiculo`, { vehiculo_id });
+  }
+
+  async cambiarEstadoPedido(id, estado) {
+    return this.put(`/pedidos/${id}/cambiar-estado`, { estado });
+  }
+
+  async deletePedido(id) {
+    return this.delete(`/pedidos/${id}`);
+  }
+
+  async aprobarSolicitud(id, data) {
+    return this.put(`/solicitudes/${id}/aprobar`, data);
+  }
+
+  crearVehiculo(data) {
+    return this.post("/vehiculos", data);
+  }
+
+  getVehiculos() {
+    return this.get("/vehiculos");
+  }
 }
 
 export default new ApiService();

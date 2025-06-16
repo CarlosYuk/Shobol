@@ -144,7 +144,7 @@ const LandingPage = () => {
             <div className="relative">
               <div className="bg-gradient-to-br from-emerald-100 to-lime-100 rounded-3xl p-8 shadow-2xl">
                 <img
-                  src="https://images.pexels.com/photos/1624496/pexels-photo-1624496.jpeg"
+                  src="../src/Img/img_pri.jpg"
                   alt="Transporte de piedra caliza"
                   className="w-full h-80 object-cover rounded-2xl shadow-lg"
                 />
@@ -274,7 +274,7 @@ const LandingPage = () => {
                   </div>
                   <div>
                     <div className="font-semibold text-stone-900">Teléfono</div>
-                    <div className="text-stone-600">+51 1 234-5678</div>
+                    <div className="text-stone-600">+0960206501</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -283,7 +283,7 @@ const LandingPage = () => {
                   </div>
                   <div>
                     <div className="font-semibold text-stone-900">Email</div>
-                    <div className="text-stone-600">contacto@shobol.com</div>
+                    <div className="text-stone-600">@shobol.com</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -295,7 +295,7 @@ const LandingPage = () => {
                       Dirección
                     </div>
                     <div className="text-stone-600">
-                      Av. Industrial 123, Lima, Perú
+                      Riobamba, San Juan, Shobol Llinllin
                     </div>
                   </div>
                 </div>
@@ -373,10 +373,10 @@ const LandingPage = () => {
             <div>
               <h4 className="font-semibold mb-4">Contacto</h4>
               <ul className="space-y-2 text-stone-400">
-                <li>+51 1 234-5678</li>
-                <li>contacto@shobol.com</li>
-                <li>Av. Industrial 123</li>
-                <li>Lima, Perú</li>
+                <li>+0960206501</li>
+                <li>@shobol.com</li>
+                <li>Riobamba, San Juan, Shobol Llinllin</li>
+                <li>Riobamba , San Juan</li>
               </ul>
             </div>
           </div>
