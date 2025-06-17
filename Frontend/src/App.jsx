@@ -69,9 +69,14 @@ const AppRoutes = () => {
         {(user.rol === "administrador" || user.rol === "gestor") && (
           <Route path="pedidos" element={<PedidosTable />} />
         )}
-        {(user.rol === "administrador" || user.rol === "gestor") && (
-          <Route path="vehiculos" element={<VehiculosTable />} />
-        )}
+        <Route
+          path="vehiculos"
+          element={
+            <ProtectedRoute roles={["administrador", "gestor"]}>
+              <VehiculosTable />
+            </ProtectedRoute>
+          }
+        />
         {user.rol === "cliente" && (
           <Route
             path="/dashboard/nueva-solicitud"

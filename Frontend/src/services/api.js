@@ -144,12 +144,24 @@ class ApiService {
     return this.put(`/solicitudes/${id}/aprobar`, data);
   }
 
+  getVehiculos() {
+    return this.get("/vehiculos");
+  }
+
   crearVehiculo(data) {
     return this.post("/vehiculos", data);
   }
 
-  getVehiculos() {
-    return this.get("/vehiculos");
+  actualizarVehiculo(id, data) {
+    return this.put(`/vehiculos/${id}`, data);
+  }
+
+  eliminarVehiculo(id) {
+    return this.delete(`/vehiculos/${id}`);
+  }
+
+  cambiarEstadoVehiculo(id, estado) {
+    return this.put(`/vehiculos/${id}/estado`, { estado });
   }
 }
 

@@ -9,7 +9,7 @@ exports.listar = async (req, res) => {
 // Crear vehículo (sólo admin o gestor)
 exports.crear = async (req, res) => {
   try {
-    const { placa, modelo, anio, nombre_chofer, nombre_propietario } = req.body;
+    const { placa, modelo, anio, nombre_chofer, nombre_propietario, estado } = req.body;
     const existe = await Vehiculo.findOne({ where: { placa } });
     if (existe) return res.status(400).json({ mensaje: "La placa ya existe." });
 
@@ -19,6 +19,7 @@ exports.crear = async (req, res) => {
       anio,
       nombre_chofer,
       nombre_propietario,
+      estado,
     });
     res.status(201).json(nuevo);
   } catch (error) {
@@ -32,12 +33,12 @@ exports.crear = async (req, res) => {
 exports.editar = async (req, res) => {
   try {
     const { id } = req.params;
-    const { modelo, anio, nombre_chofer, nombre_propietario } = req.body;
+    const { modelo, anio, nombre_chofer, nombre_propietario, estado } = req.body;
     const vehiculo = await Vehiculo.findByPk(id);
     if (!vehiculo)
       return res.status(404).json({ mensaje: "Vehículo no encontrado." });
 
-    await vehiculo.update({ modelo, anio, nombre_chofer, nombre_propietario });
+    await vehiculo.update({ modelo, anio, nombre_chofer, nombre_propietario, estado });
     res.json(vehiculo);
   } catch (error) {
     res

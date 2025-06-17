@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { USER_ROLES } from "../../types/index.js";
 import {
@@ -20,6 +20,7 @@ import {
 
 const Sidebar = () => {
   const { user } = useAuth();
+  const location = useLocation();
 
   const baseItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -36,7 +37,7 @@ const Sidebar = () => {
           { name: "Asignaciones", href: "/assignments", icon: ClipboardList },
           { name: "Cargas", href: "/loads", icon: Box },
           { name: "Rutas", href: "/routes", icon: Route },
-          { name: "Vehículos", href: "/vehicles", icon: Truck },
+          { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck }, // <-- Asegúrate que la ruta es /dashboard/vehicles
           { name: "Reportes", href: "/reports", icon: BarChart3 },
           { name: "Configuración", href: "/settings", icon: Settings },
         ];
@@ -49,7 +50,7 @@ const Sidebar = () => {
           { name: "Asignaciones", href: "/assignments", icon: ClipboardList },
           { name: "Cargas", href: "/loads", icon: Box },
           { name: "Rutas", href: "/routes", icon: Route },
-          { name: "Vehículos", href: "/vehicles", icon: Truck },
+          { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck }, // <-- Asegúrate que la ruta es /dashboard/vehicles
           { name: "Seguimiento", href: "/tracking", icon: MapPin },
           { name: "Reportes", href: "/reports", icon: BarChart3 },
         ];
@@ -115,3 +116,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+const VehiculosTable = () => <div>Gestión de Vehículos</div>;
