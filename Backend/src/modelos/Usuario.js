@@ -27,6 +27,14 @@ const Usuario = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    tokenRecuperacion: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    tokenExpira: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     tableName: "usuarios",
@@ -38,13 +46,6 @@ const Usuario = sequelize.define(
 
 Usuario.beforeCreate(async (usuario, options) => {
   if (usuario.contrasena) {
-    const salt = await bcrypt.genSalt(10);
-    usuario.contrasena = await bcrypt.hash(usuario.contrasena, salt);
-  }
-});
-
-Usuario.beforeUpdate(async (usuario, options) => {
-  if (usuario.changed("contrasena")) {
     const salt = await bcrypt.genSalt(10);
     usuario.contrasena = await bcrypt.hash(usuario.contrasena, salt);
   }

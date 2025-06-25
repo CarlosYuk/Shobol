@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { useNavigate } from 'react-router-dom';
-import { X, Eye, EyeOff, Loader2, Mountain } from 'lucide-react';
+import React, { useState } from "react";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
+import { X, Eye, EyeOff, Loader2, Mountain } from "lucide-react";
 
 const LoginModal = ({ onClose }) => {
-  const [correo, setCorreo] = useState('');
-  const [contrasena, setContrasena] = useState('');
+  const [correo, setCorreo] = useState("");
+  const [contrasena, setContrasena] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login, loading, error, setError } = useAuth();
   const navigate = useNavigate();
@@ -22,16 +22,16 @@ const LoginModal = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!correo || !contrasena) {
-      setError('Por favor complete todos los campos');
+      setError("Por favor complete todos los campos");
       return;
     }
 
     const success = await login({ correo, contrasena });
     if (success) {
       onClose();
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   };
 
@@ -64,8 +64,11 @@ const LoginModal = ({ onClose }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Usuario */}
             <div>
-              <label htmlFor="usuario" className="block text-sm font-medium text-stone-700 mb-2">
-                Usuario o Correo Electrónico
+              <label
+                htmlFor="usuario"
+                className="block text-sm font-medium text-stone-700 mb-2"
+              >
+                Correo Electrónico
               </label>
               <input
                 id="usuario"
@@ -81,14 +84,17 @@ const LoginModal = ({ onClose }) => {
 
             {/* Password */}
             <div>
-              <label htmlFor="contrasena" className="block text-sm font-medium text-stone-700 mb-2">
+              <label
+                htmlFor="contrasena"
+                className="block text-sm font-medium text-stone-700 mb-2"
+              >
                 Contraseña
               </label>
               <div className="relative">
                 <input
                   id="contrasena"
                   name="contrasena"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={contrasena}
                   onChange={handleChangeContrasena}
                   required
@@ -100,7 +106,11 @@ const LoginModal = ({ onClose }) => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -119,19 +129,17 @@ const LoginModal = ({ onClose }) => {
               className="w-full bg-gradient-to-r from-emerald-600 to-lime-600 hover:from-emerald-700 hover:to-lime-700 disabled:from-emerald-400 disabled:to-lime-400 text-white font-medium py-3 px-4 rounded-lg transition-all flex items-center justify-center space-x-2"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              <span>{loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}</span>
+              <span>{loading ? "Iniciando sesión..." : "Iniciar Sesión"}</span>
             </button>
           </form>
 
-          {/* Demo Info */}
-          <div className="mt-6 p-4 bg-stone-50 rounded-lg">
-            <h4 className="font-medium text-stone-900 mb-2">Credenciales de Demostración:</h4>
-            <div className="text-sm text-stone-600 space-y-1">
-              <div><strong>Admin:</strong> admin@shobol.com</div>
-              <div><strong>Gestor:</strong> gestor@shobol.com</div>
-              <div><strong>Cliente:</strong> cliente@shobol.com</div>
-            </div>
-          </div>
+          <button
+            type="button"
+            className="text-emerald-600 hover:underline mt-2"
+            onClick={() => navigate("/recuperar-contrasena")}
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
         </div>
       </div>
     </div>

@@ -17,6 +17,7 @@ import {
   Box,
   Plus,
 } from "lucide-react";
+//import MyRequests from "../../components/Cliente/MyRequests";
 
 const Sidebar = () => {
   const { user } = useAuth();
@@ -57,7 +58,7 @@ const Sidebar = () => {
       case USER_ROLES.CLIENT:
         return [
           ...baseItems,
-          { name: "Mis Solicitudes", href: "/my-requests", icon: FileText },
+          { name: "Mis Solicitudes", href: "/dashboard/my-requests", icon: FileText },
           {
             name: "Nueva Solicitud",
             href: "/dashboard/nueva-solicitud",
@@ -117,3 +118,6 @@ const Sidebar = () => {
 
 export default Sidebar;
 const VehiculosTable = () => <div>Gestión de Vehículos</div>;
+
+// En tu archivo de rutas
+//<Route path="/my-requests" element={<MyRequests />} />;

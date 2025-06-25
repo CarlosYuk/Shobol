@@ -17,6 +17,8 @@ import PedidosTable from "./components/Admin/PedidosTable";
 import VehiculosTable from "./components/Admin/VehiculosTable";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SolicitudForm from "./components/Cliente/SolicitudForm";
+import MyRequests from "./components/Cliente/MyRequests";
+import RecuperarContrasena from "./components/Landing/RecuperarContrasena";
 // Define los roles válidos para el sistema
 
 const ROLES_VALIDOS = ["administrador", "gestor", "cliente"];
@@ -31,6 +33,7 @@ const AppRoutes = () => {
   if (!user) {
     return (
       <Routes>
+        <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
         <Route path="*" element={<LandingPage />} />
       </Routes>
     );
@@ -83,9 +86,11 @@ const AppRoutes = () => {
             element={<SolicitudForm clienteId={user.id} />}
           />
         )}
+        <Route path="my-requests" element={<MyRequests />} />
         {/* ...otras rutas... */}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Route>
+      <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
       <Route path="*" element={<Navigate to="/dashboard" />} />
     </Routes>
   );

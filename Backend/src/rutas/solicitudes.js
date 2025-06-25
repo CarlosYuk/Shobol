@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const Solicitud = require("../modelos/Solicitud");
 const Pedido = require("../modelos/Pedido"); // Asegúrate de tener el modelo de Pedido
+const solicitudControlador = require("../controladores/solicitudControlador");
+const { verificarToken } = require("../middleware/authMiddleware");
 
 // Obtener todas las solicitudes
 router.get("/solicitudes", async (req, res) => {
@@ -76,21 +78,10 @@ router.put("/:id/aprobar", async (req, res) => {
   }
 });
 
-// Rechazar solicitud
-router.put("/:id/rechazar", async (req, res) => {
-  try {
-    const solicitud = await Solicitud.findByPk(req.params.id);
-    if (!solicitud) {
-      return res.status(404).json({ error: "Solicitud no encontrada" });
-    }
-    solicitud.estado = "rechazada";
-    solicitud.observaciones = req.body.observaciones || "";
-    await solicitud.save();
-    res.json({ solicitud });
-  } catch (error) {
-    res.status(500).json({ error: "Error al rechazar la solicitud" });
-  }
-});
+// Aceptar o rechazar solicitud
+router.post("/:id/aceptar", solicitudControlador.aceptarSolicitud);
+router.post("/:id/rechazar", solicitudControlador.rechazarSolicitud);
+router.get("/cliente", verificarToken, solicitudControlador.listarPorCliente); // Para el panel del cliente
 
 // Obtener solicitudes con filtro opcional por cliente
 router.get("/", async (req, res) => {

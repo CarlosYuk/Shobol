@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configuracion/basededatos");
+const db = require("../configuracion/basededatos"); // Asegúrate que este archivo existe y exporta la instancia de Sequelize
 
-const Solicitud = sequelize.define(
+const Solicitud = db.define(
   "Solicitud",
   {
     cliente_id: {
@@ -20,10 +20,20 @@ const Solicitud = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    motivoRechazo: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: "motivoRechazo", // coincide con la BD
+    },
+    mensajeRespuesta: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: "mensajeRespuesta",
+    },
   },
   {
     tableName: "solicitudes",
-    timestamps: false,
+    timestamps: false, // o true si usas createdAt/updatedAt
   }
 );
 

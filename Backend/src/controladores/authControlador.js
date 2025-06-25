@@ -1,86 +1,60 @@
 const Usuario = require("../modelos/Usuario");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const { Sequelize } = require("sequelize");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 // Registrar usuario (puedes enviar el rol desde el frontend si lo deseas)
 exports.registrar = async (req, res) => {
   try {
-    const { usuario, contrasena, nombre, correo } = req.body; // rol eliminado aquí
-    if (!usuario || !contrasena || !nombre || !correo)
-      return res.status(400).json({ mensaje: "Faltan datos." });
-
-    // Verifica si ya existe usuario o correo
-    const existe = await Usuario.findOne({ where: { usuario } });
-    if (existe)
-      return res.status(400).json({ mensaje: "El usuario ya existe." });
-
-    const existeCorreo = await Usuario.findOne({ where: { correo } });
-    if (existeCorreo)
-      return res.status(400).json({ mensaje: "El correo ya está registrado." });
-
-    // Encripta la contraseña
+    const { usuario, nombre, correo, contrasena, rol } = req.body;
+    // Hashea la contraseña UNA SOLA VEZ
     const hash = await bcrypt.hash(contrasena, 10);
-
-    // Crea el usuario, siempre como cliente
     const nuevoUsuario = await Usuario.create({
       usuario,
-      contrasena: hash,
       nombre,
       correo,
-      rol: "cliente", // <-- Forzar rol cliente aquí
+      contrasena,
+      rol: rol || "cliente",
     });
-
-    res.status(201).json({ mensaje: "Usuario registrado correctamente." });
+    res.status(201).json(nuevoUsuario);
   } catch (error) {
-    res
-      .status(500)
-      .json({ mensaje: "Error en el servidor.", error: error.message });
+    console.error(error);
+    res.status(500).json({ error: "Error al registrar usuario" });
   }
 };
 
 // Login: permite login con usuario o correo
 exports.login = async (req, res) => {
   console.log("BODY RECIBIDO EN LOGIN:", req.body);
-  try {
-    const { usuario, correo, contrasena } = req.body;
-    if ((!usuario && !correo) || !contrasena)
-      return res.status(400).json({ mensaje: "Faltan datos." });
+  const usuario = await Usuario.findOne({ where: { correo: req.body.correo } });
+  console.log("Usuario encontrado:", usuario ? usuario.dataValues : null);
+  if (!usuario) return res.status(401).json({ error: "Usuario no encontrado" });
 
-    const where = usuario ? { usuario } : { correo };
-    const user = await Usuario.findOne({ where });
-    if (!user)
-      return res
-        .status(400)
-        .json({ mensaje: "Usuario/correo o contraseña incorrectos." });
+  console.log("Contraseña enviada:", req.body.contrasena);
+  console.log("Hash en BD:", usuario.contrasena);
 
-    const valido = await bcrypt.compare(contrasena, user.contrasena);
-    if (!valido)
-      return res
-        .status(400)
-        .json({ mensaje: "Usuario/correo o contraseña incorrectos." });
+  const valido = await bcrypt.compare(req.body.contrasena, usuario.contrasena);
+  console.log("Contraseña válida:", valido);
+  if (!valido) return res.status(401).json({ error: "Contraseña incorrecta" });
 
-    const token = jwt.sign(
-      { id: user.id, rol: user.rol, usuario: user.usuario },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+  const token = jwt.sign(
+    { id: usuario.id, rol: usuario.rol, usuario: usuario.usuario },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
 
-    res.json({
-      mensaje: "Inicio de sesión exitoso.",
-      token,
-      usuario: {
-        id: user.id,
-        usuario: user.usuario,
-        rol: user.rol,
-        nombre: user.nombre,
-        correo: user.correo,
-      },
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ mensaje: "Error en el servidor.", error: error.message });
-  }
+  res.json({
+    mensaje: "Inicio de sesión exitoso.",
+    token,
+    usuario: {
+      id: usuario.id,
+      usuario: usuario.usuario,
+      rol: usuario.rol,
+      nombre: usuario.nombre,
+      correo: usuario.correo,
+    },
+  });
 };
 
 // Listar usuarios (admin ve todos, gestor solo clientes)
@@ -98,4 +72,44 @@ exports.listarUsuarios = async (req, res) => {
   } catch (error) {
     res.status(500).json({ mensaje: "Error al obtener usuarios." });
   }
+};
+
+exports.solicitarRecuperacion = async (req, res) => {
+  const { correo } = req.body;
+  const usuario = await Usuario.findOne({ where: { correo } });
+  if (!usuario) return res.json({ mensaje: "Si el correo existe, recibirás instrucciones." });
+
+  // Genera token único y fecha de expiración
+  const token = crypto.randomBytes(32).toString("hex");
+  usuario.tokenRecuperacion = token;
+  usuario.tokenExpira = Date.now() + 1000 * 60 * 60; // 1 hora
+  await usuario.save();
+
+  // Envía email (configura tu transporter real)
+  const transporter = nodemailer.createTransport({ /* ... */ });
+  await transporter.sendMail({
+    to: correo,
+    subject: "Recupera tu contraseña",
+    text: `Haz clic aquí para restablecer tu contraseña: http://localhost:5173/restablecer-contrasena?token=${token}`
+  });
+
+  res.json({ mensaje: "Si el correo existe, recibirás instrucciones." });
+};
+
+exports.restablecerContrasena = async (req, res) => {
+  const { token, contrasena } = req.body;
+  const usuario = await Usuario.findOne({
+    where: {
+      tokenRecuperacion: token,
+      tokenExpira: { [Sequelize.Op.gt]: Date.now() }
+    }
+  });
+  if (!usuario) return res.status(400).json({ error: "Token inválido o expirado" });
+
+  usuario.contrasena = contrasena; // El modelo la hasheará
+  usuario.tokenRecuperacion = null;
+  usuario.tokenExpira = null;
+  await usuario.save();
+
+  res.json({ mensaje: "Contraseña restablecida" });
 };

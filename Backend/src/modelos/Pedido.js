@@ -57,6 +57,4 @@ const Pedido = sequelize.define(
   }
 );
 
-
-
 module.exports = Pedido;

@@ -166,3 +166,49 @@ class ApiService {
 }
 
 export default new ApiService();
+
+export async function aceptarSolicitud(id) {
+  const res = await fetch(`${API_BASE_URL}/solicitudes/${id}/aceptar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) throw new Error("Error al aceptar");
+  return res.json();
+}
+
+export async function rechazarSolicitud(id, motivo) {
+  const res = await fetch(`${API_BASE_URL}/solicitudes/${id}/rechazar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ motivo }),
+  });
+  if (!res.ok) throw new Error("Error al rechazar");
+  return res.json();
+}
+
+export async function getSolicitudesCliente() {
+  const token = localStorage.getItem("token");
+  const res = await fetch("http://localhost:5000/api/solicitudes/cliente", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al obtener solicitudes");
+  return res.json();
+}
+
+export async function solicitarRecuperacion(correo) {
+  await fetch("http://localhost:5000/api/auth/recuperar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ correo }),
+  });
+}
+
+export async function restablecerContrasena(token, contrasena) {
+  await fetch("http://localhost:5000/api/auth/restablecer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, contrasena }),
+  });
+}
