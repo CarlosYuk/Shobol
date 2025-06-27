@@ -11,10 +11,12 @@ import {
 import ApiService from "../../services/api";
 import SolicitudForm from "../Cliente/SolicitudForm";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom"; // <-- Importa useNavigate
 
 const ClientDashboard = () => {
   const { user } = useAuth();
   const [solicitudes, setSolicitudes] = useState([]);
+  const navigate = useNavigate(); // <-- Hook de navegación
 
   const cargarSolicitudes = async () => {
     try {
@@ -225,14 +227,20 @@ const ClientDashboard = () => {
           Acciones Rápidas
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center space-x-3 p-4 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
+          <button
+            className="flex items-center space-x-3 p-4 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
+            onClick={() => navigate("/dashboard/nueva-solicitud")}
+          >
             <Package className="h-6 w-6 text-emerald-600" />
             <div className="text-left">
               <div className="font-medium text-stone-900">Nuevo Envío</div>
               <div className="text-sm text-stone-500">Solicitar transporte</div>
             </div>
           </button>
-          <button className="flex items-center space-x-3 p-4 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
+          <button
+            className="flex items-center space-x-3 p-4 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
+            onClick={() => navigate("/tracking")}
+          >
             <MapPin className="h-6 w-6 text-lime-600" />
             <div className="text-left">
               <div className="font-medium text-stone-900">Rastrear Envío</div>
@@ -241,7 +249,10 @@ const ClientDashboard = () => {
               </div>
             </div>
           </button>
-          <button className="flex items-center space-x-3 p-4 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
+          <button
+            className="flex items-center space-x-3 p-4 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
+            onClick={() => navigate("/soporte")}
+          >
             <AlertCircle className="h-6 w-6 text-amber-600" />
             <div className="text-left">
               <div className="font-medium text-stone-900">Soporte</div>

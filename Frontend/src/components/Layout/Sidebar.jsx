@@ -35,12 +35,10 @@ const Sidebar = () => {
           { name: "Usuarios", href: "/dashboard/usuarios", icon: Users },
           { name: "Solicitudes", href: "/dashboard/requests", icon: FileText },
           { name: "Pedidos", href: "/dashboard/pedidos", icon: ClipboardList },
-          { name: "Asignaciones", href: "/assignments", icon: ClipboardList },
-          { name: "Cargas", href: "/loads", icon: Box },
           { name: "Rutas", href: "/routes", icon: Route },
-          { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck }, // <-- Asegúrate que la ruta es /dashboard/vehicles
-          { name: "Reportes", href: "/reports", icon: BarChart3 },
-          { name: "Configuración", href: "/settings", icon: Settings },
+          { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck },
+          { name: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
+          //{ name: "Configuración", href: "/settings", icon: Settings },
         ];
       case USER_ROLES.GESTOR:
         return [
@@ -48,17 +46,19 @@ const Sidebar = () => {
           { name: "Usuarios", href: "/dashboard/usuarios", icon: Users },
           { name: "Solicitudes", href: "/dashboard/requests", icon: FileText },
           { name: "Pedidos", href: "/dashboard/pedidos", icon: ClipboardList },
-          { name: "Asignaciones", href: "/assignments", icon: ClipboardList },
-          { name: "Cargas", href: "/loads", icon: Box },
           { name: "Rutas", href: "/routes", icon: Route },
-          { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck }, // <-- Asegúrate que la ruta es /dashboard/vehicles
-          { name: "Seguimiento", href: "/tracking", icon: MapPin },
-          { name: "Reportes", href: "/reports", icon: BarChart3 },
+          { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck },
+          //{ name: "Seguimiento", href: "/tracking", icon: MapPin },
+          //{ name: "Reportes", href: "/reports", icon: BarChart3 },
         ];
       case USER_ROLES.CLIENT:
         return [
           ...baseItems,
-          { name: "Mis Solicitudes", href: "/dashboard/my-requests", icon: FileText },
+          {
+            name: "Mis Solicitudes",
+            href: "/dashboard/my-requests",
+            icon: FileText,
+          },
           {
             name: "Nueva Solicitud",
             href: "/dashboard/nueva-solicitud",

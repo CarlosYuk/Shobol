@@ -19,6 +19,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SolicitudForm from "./components/Cliente/SolicitudForm";
 import MyRequests from "./components/Cliente/MyRequests";
 import RecuperarContrasena from "./components/Landing/RecuperarContrasena";
+import Reportes from "./pages/Reportes";
 // Define los roles válidos para el sistema
 
 const ROLES_VALIDOS = ["administrador", "gestor", "cliente"];
@@ -87,6 +88,7 @@ const AppRoutes = () => {
           />
         )}
         <Route path="my-requests" element={<MyRequests />} />
+        <Route path="reports" element={<Reportes />} />
         {/* ...otras rutas... */}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Route>

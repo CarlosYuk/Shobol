@@ -1,12 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const reporteCtrl = require("../controladores/reporteControlador");
-const { verificarToken, soloAdmin } = require("../middleware/authMiddleware");
+const reportes = require("../controladores/reporteControlador");
 
-// Listar reportes
-router.get("/reportes", verificarToken, reporteCtrl.listar);
+// Usuarios
+router.get("/usuarios/excel", reportes.reporteUsuariosExcel);
+router.get("/usuarios/pdf", reportes.reporteUsuariosPDF);
 
-// Crear reporte
-router.post("/reportes", verificarToken, soloAdmin, reporteCtrl.crear);
+// Solicitudes
+router.get("/solicitudes/excel", reportes.reporteSolicitudesExcel);
+router.get("/solicitudes/pdf", reportes.reporteSolicitudesPDF);
+
+// Vehículos
+router.get("/vehiculos/excel", reportes.reporteVehiculosExcel);
+router.get("/vehiculos/pdf", reportes.reporteVehiculosPDF);
+
+// Pedidos
+router.get("/pedidos/excel", reportes.reportePedidosExcel);
+router.get("/pedidos/pdf", reportes.reportePedidosPDF);
 
 module.exports = router;

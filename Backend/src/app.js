@@ -33,7 +33,7 @@ app.use("/api", rutasRoutes);
 app.use("/api/solicitudes", solicitudesRouter);
 //app.use("/api", cargasRoutes);
 app.use("/api", asignacionesRoutes);
-app.use("/api", reportesRoutes);
+app.use("/api/reportes", require("./rutas/reportes"));
 app.use("/api", pedidosRoutes);
 
 const PUERTO = process.env.PUERTO || 3000;
