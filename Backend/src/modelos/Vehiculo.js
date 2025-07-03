@@ -4,31 +4,12 @@ const sequelize = require("../configuracion/basededatos");
 const Vehiculo = sequelize.define(
   "Vehiculo",
   {
-    placa: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    modelo: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    anio: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    nombre_chofer: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    nombre_propietario: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    estado: {
-      type: DataTypes.STRING,
-      defaultValue: "disponible",
-    },
+    placa: { type: DataTypes.STRING, allowNull: false, unique: true },
+    modelo: { type: DataTypes.STRING, allowNull: false },
+    anio: { type: DataTypes.INTEGER, allowNull: false },
+    nombre_chofer: { type: DataTypes.STRING, allowNull: false },
+    nombre_propietario: { type: DataTypes.STRING, allowNull: false },
+    estado: { type: DataTypes.STRING, allowNull: false, defaultValue: "disponible" },
   },
   {
     tableName: "vehiculos",

@@ -133,7 +133,11 @@ class ApiService {
   }
 
   async cambiarEstadoPedido(id, estado) {
-    return this.put(`/pedidos/${id}/cambiar-estado`, { estado });
+    if (estado === "entregado") {
+      return this.put(`/pedidos/${id}/entregar`);
+    }
+    // Si quieres cambiar a otros estados, usa actualizarPedido:
+    return this.put(`/pedidos/${id}`, { estado });
   }
 
   async deletePedido(id) {
@@ -162,6 +166,14 @@ class ApiService {
 
   cambiarEstadoVehiculo(id, estado) {
     return this.put(`/vehiculos/${id}/estado`, { estado });
+  }
+
+  async marcarPedidoEntregado(id) {
+    return this.put(`/pedidos/${id}/entregar`);
+  }
+
+  async getVehiculosDisponibles() {
+    return this.get("/vehiculos/disponibles");
   }
 }
 
@@ -211,4 +223,12 @@ export async function restablecerContrasena(token, contrasena) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, contrasena }),
   });
+}
+
+try {
+  await ApiService.asignarVehiculoPedido(pedidoId, vehiculoId);
+  // Mostrar mensaje de éxito (opcional)
+} catch (error) {
+  // Mostrar advertencia con el mensaje del backend
+  alert(error.message); // O usa un modal/toast
 }

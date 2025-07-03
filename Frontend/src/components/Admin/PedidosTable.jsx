@@ -23,7 +23,7 @@ const PedidosTable = () => {
     setLoading(true);
     try {
       const data = await ApiService.getPedidos();
-      setPedidos(data);
+      setPedidos(Array.isArray(data) ? data : []);
     } catch {
       setPedidos([]);
     }
@@ -37,19 +37,24 @@ const PedidosTable = () => {
   // Abrir modal y cargar vehículos
   const openAsignarVehiculoModal = async (pedidoId) => {
     setPedidoSeleccionado(pedidoId);
-    const lista = await ApiService.getVehicles();
+    const lista = await ApiService.getVehiculosDisponibles();
     setVehiculos(lista);
     setShowVehiculoModal(true);
   };
 
   // Asignar vehículo
   const handleAsignarVehiculo = async () => {
-    await ApiService.asignarVehiculoPedido(pedidoSeleccionado, vehiculoId);
-    setShowVehiculoModal(false);
-    setVehiculoId("");
-    setPedidoSeleccionado(null);
-    cargarPedidos(); // refresca la tabla
-    toast.success("Acción realizada correctamente");
+    try {
+      await ApiService.asignarVehiculoPedido(pedidoSeleccionado, vehiculoId);
+      setShowVehiculoModal(false);
+      setVehiculoId("");
+      setPedidoSeleccionado(null);
+      cargarPedidos(); // refresca la tabla
+      toast.success("Vehículo asignado correctamente");
+    } catch (error) {
+      // Mostrar mensaje de advertencia del backend
+      toast.error(error.message || "No se pudo asignar el vehículo");
+    }
   };
 
   // Cambiar estado
@@ -79,17 +84,23 @@ const PedidosTable = () => {
     saveAs(data, "pedidos.xlsx");
   };
 
-  const pedidosFiltrados = filtroEstado
-    ? pedidos.filter((p) => p.estado === filtroEstado)
-    : pedidos;
+  const pedidosFiltrados = Array.isArray(pedidos)
+    ? filtroEstado
+      ? pedidos.filter((p) => p.estado === filtroEstado)
+      : pedidos
+    : [];
 
-  const pedidosBuscados = busqueda
-    ? pedidosFiltrados.filter(
-        (p) =>
-          p.direccion_entrega.toLowerCase().includes(busqueda.toLowerCase()) ||
-          p.solicitud_id.toString().includes(busqueda)
-      )
-    : pedidosFiltrados;
+  const pedidosBuscados = Array.isArray(pedidosFiltrados)
+    ? busqueda
+      ? pedidosFiltrados.filter(
+          (p) =>
+            p.direccion_entrega
+              .toLowerCase()
+              .includes(busqueda.toLowerCase()) ||
+            p.solicitud_id.toString().includes(busqueda)
+        )
+      : pedidosFiltrados
+    : [];
 
   const openDetallesModal = (pedido) => {
     setPedidoDetalle(pedido);
@@ -181,7 +192,7 @@ const PedidosTable = () => {
                   </td>
                 </tr>
               )}
-              {pedidosBuscados.map((p) => (
+              {(pedidosBuscados || []).map((p) => (
                 <tr key={p.id}>
                   <td className="px-4 py-2">{p.id}</td>
                   <td className="px-4 py-2">{p.solicitud_id}</td>
@@ -249,7 +260,7 @@ const PedidosTable = () => {
                       onClick={() => setModalSolicitud(p)}
                     >
                       Aprobar y crear pedido
-                    </button> */}  
+                    </button> */}
                   </td>
                   <td className="px-4 py-2">
                     {p.vehiculo_id

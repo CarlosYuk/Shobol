@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const vehiculoCtrl = require("../controladores/vehiculoControlador");
-const Vehiculo = require("../modelos/Vehiculo"); 
+const Vehiculo = require("../modelos/Vehiculo");
 const {
   verificarToken,
   soloAdmin,
@@ -147,5 +147,8 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: "Error al eliminar vehículo" });
   }
 });
+
+// Obtener vehículos disponibles
+router.get("/disponibles", vehiculoCtrl.obtenerVehiculosDisponibles);
 
 module.exports = router;

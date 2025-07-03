@@ -22,29 +22,21 @@ const Pedido = sequelize.define(
       allowNull: false,
     },
     cantidad_toneladas: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.FLOAT,
       allowNull: false,
-    },
-    volumen: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    tipo_carga: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     direccion_entrega: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     fecha_entrega: {
-      type: DataTypes.DATEONLY,
-      allowNull: true,
+      type: DataTypes.DATE,
+      allowNull: false,
     },
     estado: {
       type: DataTypes.STRING,
-      defaultValue: "pendiente",
       allowNull: false,
+      defaultValue: "pendiente",
     },
     vehiculo_id: {
       type: DataTypes.INTEGER,
@@ -53,7 +45,9 @@ const Pedido = sequelize.define(
   },
   {
     tableName: "pedidos",
-    timestamps: false,
+    timestamps: true,
+    createdAt: "creado_en",
+    updatedAt: false,
   }
 );
 
