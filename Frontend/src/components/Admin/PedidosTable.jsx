@@ -34,11 +34,19 @@ const PedidosTable = () => {
     cargarPedidos();
   }, []);
 
+  const cargarVehiculos = async () => {
+    try {
+      const data = await ApiService.getVehiculos();
+      setVehiculos(Array.isArray(data) ? data : []);
+    } catch {
+      setVehiculos([]);
+    }
+  };
+
   // Abrir modal y cargar vehículos
-  const openAsignarVehiculoModal = async (pedidoId) => {
+  const openAsignarVehiculoModal = (pedidoId) => {
     setPedidoSeleccionado(pedidoId);
-    const lista = await ApiService.getVehiculosDisponibles();
-    setVehiculos(lista);
+    cargarVehiculos(); // <--- carga los vehículos aquí
     setShowVehiculoModal(true);
   };
 
@@ -224,9 +232,7 @@ const PedidosTable = () => {
                     <button
                       className="bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => openAsignarVehiculoModal(p.id)}
-                      disabled={
-                        p.estado === "entregado" || p.estado === "cancelado"
-                      }
+                      disabled={p.estado === "entregado" || p.estado === "cancelado"}
                     >
                       Asignar Vehículo
                     </button>
@@ -263,9 +269,8 @@ const PedidosTable = () => {
                     </button> */}
                   </td>
                   <td className="px-4 py-2">
-                    {p.vehiculo_id
-                      ? vehiculos.find((v) => v.id === p.vehiculo_id)?.placa ||
-                        p.vehiculo_id
+                    {p.vehiculo
+                      ? `${p.vehiculo.numero_vehiculo} (${p.vehiculo.placa})`
                       : "Sin asignar"}
                   </td>
                 </tr>
@@ -285,11 +290,13 @@ const PedidosTable = () => {
               onChange={(e) => setVehiculoId(e.target.value)}
             >
               <option value="">Selecciona un vehículo</option>
-              {vehiculos.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.placa} - {v.modelo}
-                </option>
-              ))}
+              {vehiculos
+                .filter((v) => v.estado === "disponible") // <-- solo disponibles
+                .map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.placa} - {v.modelo}
+                  </option>
+                ))}
             </select>
             <div className="flex justify-end space-x-2">
               <button
@@ -333,9 +340,8 @@ const PedidosTable = () => {
             </div>
             <div className="mb-2">
               <b>Vehículo:</b>{" "}
-              {pedidoDetalle.vehiculo_id
-                ? vehiculos.find((v) => v.id === pedidoDetalle.vehiculo_id)
-                    ?.placa || pedidoDetalle.vehiculo_id
+              {pedidoDetalle.vehiculo
+                ? pedidoDetalle.vehiculo.numero_vehiculo
                 : "Sin asignar"}
             </div>
             <div className="flex justify-end mt-4">

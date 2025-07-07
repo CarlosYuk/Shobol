@@ -9,9 +9,10 @@ exports.listar = async (req, res) => {
 
 // Crear vehículo (sólo admin o gestor)
 exports.crear = async (req, res) => {
+  console.log("Entrando a crear vehículo");
+  console.log("Body recibido:", req.body);
   try {
-    const { placa, modelo, anio, nombre_chofer, nombre_propietario, estado } =
-      req.body;
+    const { placa, modelo, anio, nombre_chofer, nombre_propietario, estado, numero_vehiculo } = req.body;
     const existe = await Vehiculo.findOne({ where: { placa } });
     if (existe) return res.status(400).json({ mensaje: "La placa ya existe." });
 
@@ -22,12 +23,14 @@ exports.crear = async (req, res) => {
       nombre_chofer,
       nombre_propietario,
       estado,
+      numero_vehiculo,
     });
     res.status(201).json(nuevo);
   } catch (error) {
+    console.error("Error al crear vehículo:", error);
     res
       .status(500)
-      .json({ mensaje: "Error en el servidor.", error: error.message });
+      .json({ error: "Error al crear vehículo", detalle: error.message });
   }
 };
 
@@ -35,7 +38,7 @@ exports.crear = async (req, res) => {
 exports.editar = async (req, res) => {
   try {
     const { id } = req.params;
-    const { modelo, anio, nombre_chofer, nombre_propietario, estado } =
+    const { modelo, anio, nombre_chofer, nombre_propietario, estado, numero_vehiculo } =
       req.body;
     const vehiculo = await Vehiculo.findByPk(id);
     if (!vehiculo)
@@ -47,6 +50,7 @@ exports.editar = async (req, res) => {
       nombre_chofer,
       nombre_propietario,
       estado,
+      numero_vehiculo, // <-- agrega este campo
     });
     res.json(vehiculo);
   } catch (error) {
@@ -77,9 +81,11 @@ exports.eliminar = async (req, res) => {
 exports.asignarVehiculoAPedido = async (req, res) => {
   const { pedidoId, vehiculoId } = req.body;
 
+  console.log("Body recibido:", req.body);
+
   // Asigna el vehículo al pedido
   await Pedido.update(
-    { vehiculoId, estado: "asignado" },
+    { vehiculo_id: vehiculoId, estado: "asignado" }, // <-- usa vehiculo_id
     { where: { id: pedidoId } }
   );
 
@@ -99,11 +105,11 @@ exports.marcarPedidoEntregado = async (req, res) => {
   // Busca el pedido para obtener el vehículo asignado
   const pedido = await Pedido.findByPk(pedidoId);
 
-  if (pedido && pedido.vehiculoId) {
+  if (pedido && pedido.vehiculo_id) { // <-- usa vehiculo_id
     // Marca el vehículo como disponible
     await Vehiculo.update(
       { estado: "disponible" },
-      { where: { id: pedido.vehiculoId } }
+      { where: { id: pedido.vehiculo_id } } // <-- usa vehiculo_id
     );
   }
 

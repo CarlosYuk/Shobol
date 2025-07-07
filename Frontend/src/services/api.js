@@ -224,11 +224,3 @@ export async function restablecerContrasena(token, contrasena) {
     body: JSON.stringify({ token, contrasena }),
   });
 }
-
-try {
-  await ApiService.asignarVehiculoPedido(pedidoId, vehiculoId);
-  // Mostrar mensaje de éxito (opcional)
-} catch (error) {
-  // Mostrar advertencia con el mensaje del backend
-  alert(error.message); // O usa un modal/toast
-}

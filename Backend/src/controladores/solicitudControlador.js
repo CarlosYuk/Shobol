@@ -1,4 +1,6 @@
 const Solicitud = require("../modelos/Solicitud");
+const Pedido = require("../modelos/Pedido");
+const Vehiculo = require("../modelos/Vehiculo");
 
 // Listar solicitudes
 exports.listar = async (req, res) => {
@@ -113,4 +115,25 @@ exports.listarPorCliente = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Error al obtener solicitudes" });
   }
+};
+
+// Obtener solicitudes con detalles del cliente, pedido y vehículo
+exports.obtenerSolicitudesCliente = async (req, res) => {
+  const usuarioId = req.usuario.id;
+  const solicitudes = await Solicitud.findAll({
+    where: { usuario_id: usuarioId },
+    include: [
+      {
+        model: Pedido,
+        as: "pedido",
+        include: [
+          {
+            model: Vehiculo,
+            as: "vehiculo",
+          },
+        ],
+      },
+    ],
+  });
+  res.json(solicitudes);
 };

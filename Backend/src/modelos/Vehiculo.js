@@ -10,6 +10,7 @@ const Vehiculo = sequelize.define(
     nombre_chofer: { type: DataTypes.STRING, allowNull: false },
     nombre_propietario: { type: DataTypes.STRING, allowNull: false },
     estado: { type: DataTypes.STRING, allowNull: false, defaultValue: "disponible" },
+    numero_vehiculo: { type: DataTypes.STRING, allowNull: false, unique: true },
   },
   {
     tableName: "vehiculos",

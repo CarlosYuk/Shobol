@@ -20,6 +20,7 @@ require("./modelos/Solicitud");
 //require("./modelos/Carga");
 require("./modelos/Asignacion");
 require("./modelos/Reporte");
+require("./modelos/asociaciones");
 const app = express();
 
 app.use(express.json());
@@ -28,7 +29,7 @@ app.use(morgan("dev"));
 
 app.use("/api/auth", authRutas);
 app.use("/api", usuariosRoutes);
-app.use("/api/vehiculos", vehiculosRouter);
+app.use("/api", vehiculosRouter);
 app.use("/api", rutasRoutes);
 app.use("/api/solicitudes", solicitudesRouter);
 //app.use("/api", cargasRoutes);

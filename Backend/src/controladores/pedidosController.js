@@ -4,7 +4,15 @@ const Vehiculo = require("../modelos/Vehiculo");
 // Obtener todos los pedidos
 exports.obtenerPedidos = async (req, res) => {
   try {
-    const pedidos = await Pedido.findAll();
+    const pedidos = await Pedido.findAll({
+      include: [
+        {
+          model: Vehiculo,
+          as: "vehiculo",
+          attributes: ["numero_vehiculo", "placa", "modelo"], // agrega los campos que quieras mostrar
+        },
+      ],
+    });
     res.json(pedidos);
   } catch (error) {
     console.error("Error en obtenerPedidos:", error);
@@ -84,7 +92,8 @@ exports.asignarVehiculo = async (req, res) => {
     if (!pedido) return res.status(404).json({ error: "Pedido no encontrado" });
 
     const vehiculo = await Vehiculo.findByPk(req.body.vehiculo_id);
-    if (!vehiculo) return res.status(404).json({ error: "Vehículo no encontrado" });
+    if (!vehiculo)
+      return res.status(404).json({ error: "Vehículo no encontrado" });
     if (vehiculo.estado !== "disponible") {
       return res.status(400).json({ error: "Vehículo no disponible" });
     }
@@ -133,7 +142,8 @@ exports.asignarVehiculoAPedido = async (req, res) => {
     if (!pedido) return res.status(404).json({ error: "Pedido no encontrado" });
 
     const vehiculo = await Vehiculo.findByPk(req.body.vehiculo_id);
-    if (!vehiculo) return res.status(404).json({ error: "Vehículo no encontrado" });
+    if (!vehiculo)
+      return res.status(404).json({ error: "Vehículo no encontrado" });
 
     if (vehiculo.estado !== "disponible") {
       return res.status(400).json({ error: "Vehículo no disponible" });

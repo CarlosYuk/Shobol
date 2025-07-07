@@ -15,6 +15,7 @@ const VehiculosTable = () => {
     nombre_chofer: "",
     nombre_propietario: "",
     estado: "disponible",
+    numero_vehiculo: "",
   });
   const [errores, setErrores] = useState({});
   const [cargando, setCargando] = useState(false);
@@ -51,6 +52,8 @@ const VehiculosTable = () => {
     ) {
       err.anio = `Año debe estar entre 1900 y ${anioActual}`;
     }
+    if (!datos.numero_vehiculo)
+      err.numero_vehiculo = "Número de vehículo requerido";
     return err;
   };
 
@@ -75,7 +78,10 @@ const VehiculosTable = () => {
     try {
       if (editando) {
         await ApiService.actualizarVehiculo(editando.id, form);
-        setMensaje({ tipo: "exito", texto: "Vehículo actualizado correctamente." });
+        setMensaje({
+          tipo: "exito",
+          texto: "Vehículo actualizado correctamente.",
+        });
       } else {
         await ApiService.crearVehiculo(form);
         setMensaje({ tipo: "exito", texto: "Vehículo creado correctamente." });
@@ -89,6 +95,7 @@ const VehiculosTable = () => {
         nombre_chofer: "",
         nombre_propietario: "",
         estado: "disponible",
+        numero_vehiculo: "",
       });
       cargarVehiculos();
     } catch {
@@ -107,6 +114,7 @@ const VehiculosTable = () => {
       nombre_chofer: vehiculo.nombre_chofer,
       nombre_propietario: vehiculo.nombre_propietario,
       estado: vehiculo.estado,
+      numero_vehiculo: vehiculo.numero_vehiculo,
     });
     setErrores({});
     setShowForm(true);
@@ -116,7 +124,10 @@ const VehiculosTable = () => {
     if (window.confirm("¿Seguro que deseas eliminar este vehículo?")) {
       try {
         await ApiService.eliminarVehiculo(id);
-        setMensaje({ tipo: "exito", texto: "Vehículo eliminado correctamente." });
+        setMensaje({
+          tipo: "exito",
+          texto: "Vehículo eliminado correctamente.",
+        });
         cargarVehiculos();
       } catch {
         setMensaje({ tipo: "error", texto: "Error al eliminar el vehículo." });
@@ -131,7 +142,10 @@ const VehiculosTable = () => {
       setMensaje({ tipo: "exito", texto: "Estado actualizado correctamente." });
       cargarVehiculos();
     } catch {
-      setMensaje({ tipo: "error", texto: "Error al cambiar el estado del vehículo." });
+      setMensaje({
+        tipo: "error",
+        texto: "Error al cambiar el estado del vehículo.",
+      });
     }
     setTimeout(() => setMensaje(null), 3000);
   };
@@ -162,6 +176,7 @@ const VehiculosTable = () => {
             nombre_chofer: "",
             nombre_propietario: "",
             estado: "disponible",
+            numero_vehiculo: "",
           });
           setErrores({});
         }}
@@ -248,6 +263,23 @@ const VehiculosTable = () => {
             </select>
           </div>
           <div className="flex gap-2">
+            <div className="w-full">
+              <input
+                name="numero_vehiculo"
+                value={form.numero_vehiculo}
+                onChange={handleChange}
+                placeholder="Número de Vehículo"
+                required
+                className="border px-2 py-1 rounded w-full"
+              />
+              {errores.numero_vehiculo && (
+                <span className="text-red-600 text-xs">
+                  {errores.numero_vehiculo}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2">
             <button
               type="submit"
               className="bg-emerald-600 text-white px-3 py-1 rounded"
@@ -282,6 +314,7 @@ const VehiculosTable = () => {
               <th>Chofer</th>
               <th>Propietario</th>
               <th>Estado</th>
+              <th>Número Vehículo</th> {/* Nueva columna */}
               <th>Acciones</th>
             </tr>
           </thead>
@@ -308,6 +341,7 @@ const VehiculosTable = () => {
                     ))}
                   </select>
                 </td>
+                <td>{v.numero_vehiculo}</td> {/* Mostrar número de vehículo */}
                 <td>
                   <button
                     className="text-blue-600 mr-2"

@@ -85,13 +85,34 @@ const MyRequests = () => {
           >
             <h3 className="text-lg font-semibold mb-2">Detalles del Pedido</h3>
             <p>
-              <b>Fecha:</b>{" "}
-              {new Date(detalle.fecha_solicitud).toLocaleString()}
+              <b>Fecha:</b> {detalle.fecha}
             </p>
             <p>
               <b>Observaciones:</b> {detalle.observaciones}
             </p>
-            {/* Agrega aquí más detalles según tu modelo */}
+            {/* Si existe pedido relacionado */}
+            {detalle.pedido && (
+              <>
+                <p>
+                  <b>Cantidad (ton):</b> {detalle.pedido.cantidad_toneladas}
+                </p>
+                <p>
+                  <b>Dirección:</b> {detalle.pedido.direccion_entrega}
+                </p>
+                <p>
+                  <b>Fecha Entrega:</b> {detalle.pedido.fecha_entrega}
+                </p>
+                <p>
+                  <b>Estado Pedido:</b> {detalle.pedido.estado}
+                </p>
+                <p>
+                  <b>Vehículo:</b>{" "}
+                  {detalle.pedido.vehiculo
+                    ? `${detalle.pedido.vehiculo.numero_vehiculo} (${detalle.pedido.vehiculo.placa})`
+                    : "Sin asignar"}
+                </p>
+              </>
+            )}
             <button
               onClick={() => setDetalle(null)}
               className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
