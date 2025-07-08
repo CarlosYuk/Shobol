@@ -81,7 +81,7 @@ router.put("/:id/aprobar", async (req, res) => {
 // Aceptar o rechazar solicitud
 router.post("/:id/aceptar", solicitudControlador.aceptarSolicitud);
 router.post("/:id/rechazar", solicitudControlador.rechazarSolicitud);
-router.get("/cliente", verificarToken, solicitudControlador.listarPorCliente); // Para el panel del cliente
+router.get("/cliente", verificarToken, solicitudControlador.obtenerSolicitudesCliente); // Para el panel del cliente
 
 // Obtener solicitudes con filtro opcional por cliente
 router.get("/", async (req, res) => {

@@ -64,9 +64,9 @@ const Sidebar = () => {
             href: "/dashboard/nueva-solicitud",
             icon: Plus,
           },
-          { name: "Mis Envíos", href: "/my-shipments", icon: Package },
+          // { name: "Mis Envíos", href: "/my-shipments", icon: Package },
           { name: "Seguimiento", href: "/tracking", icon: MapPin },
-          { name: "Historial", href: "/history", icon: BarChart3 },
+          //{ name: "Historial", href: "/history", icon: BarChart3 },
         ];
       default:
         return baseItems;

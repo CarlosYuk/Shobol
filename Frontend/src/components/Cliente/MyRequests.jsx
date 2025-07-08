@@ -83,34 +83,67 @@ const MyRequests = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold mb-2">Detalles del Pedido</h3>
+            <h3 className="text-lg font-semibold mb-2">Detalles de la Solicitud</h3>
             <p>
-              <b>Fecha:</b> {detalle.fecha}
+              <b>Fecha Solicitud:</b> {detalle.fecha_solicitud || detalle.fecha}
             </p>
             <p>
               <b>Observaciones:</b> {detalle.observaciones}
             </p>
-            {/* Si existe pedido relacionado */}
+            <p>
+              <b>Estado Solicitud:</b> {detalle.estado}
+            </p>
+            {/* Mostrar detalles del pedido si existen */}
             {detalle.pedido && (
               <>
+                <hr className="my-2" />
+                <h4 className="font-semibold mb-1">Datos del Pedido</h4>
+                <p>
+                  <b>ID Pedido:</b> {detalle.pedido.id}
+                </p>
                 <p>
                   <b>Cantidad (ton):</b> {detalle.pedido.cantidad_toneladas}
                 </p>
                 <p>
-                  <b>Dirección:</b> {detalle.pedido.direccion_entrega}
+                  <b>Dirección de Entrega:</b> {detalle.pedido.direccion_entrega}
                 </p>
                 <p>
-                  <b>Fecha Entrega:</b> {detalle.pedido.fecha_entrega}
+                  <b>Fecha de Entrega:</b> {detalle.pedido.fecha_entrega}
                 </p>
                 <p>
                   <b>Estado Pedido:</b> {detalle.pedido.estado}
                 </p>
                 <p>
-                  <b>Vehículo:</b>{" "}
-                  {detalle.pedido.vehiculo
-                    ? `${detalle.pedido.vehiculo.numero_vehiculo} (${detalle.pedido.vehiculo.placa})`
-                    : "Sin asignar"}
+                  <b>Mensaje:</b> {detalle.pedido.mensaje || "-"}
                 </p>
+                {/* Mostrar detalles del vehículo si existen */}
+                {detalle.pedido.vehiculo && (
+                  <>
+                    <hr className="my-2" />
+                    <h4 className="font-semibold mb-1">Vehículo Asignado</h4>
+                    <p>
+                      <b>Número Vehículo:</b> {detalle.pedido.vehiculo.numero_vehiculo}
+                    </p>
+                    <p>
+                      <b>Placa:</b> {detalle.pedido.vehiculo.placa}
+                    </p>
+                    <p>
+                      <b>Modelo:</b> {detalle.pedido.vehiculo.modelo}
+                    </p>
+                    <p>
+                      <b>Año:</b> {detalle.pedido.vehiculo.anio}
+                    </p>
+                    <p>
+                      <b>Chofer:</b> {detalle.pedido.vehiculo.nombre_chofer}
+                    </p>
+                    <p>
+                      <b>Propietario:</b> {detalle.pedido.vehiculo.nombre_propietario}
+                    </p>
+                    <p>
+                      <b>Estado Vehículo:</b> {detalle.pedido.vehiculo.estado}
+                    </p>
+                  </>
+                )}
               </>
             )}
             <button

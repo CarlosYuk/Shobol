@@ -17,10 +17,8 @@ require("./modelos/Usuario"); // Haz lo mismo con los otros modelos cuando los c
 require("./modelos/Vehiculo");
 require("./modelos/Ruta");
 require("./modelos/Solicitud");
-//require("./modelos/Carga");
-require("./modelos/Asignacion");
-require("./modelos/Reporte");
-require("./modelos/asociaciones");
+require("./modelos/Pedido");
+require("./modelos/asociaciones"); // <-- Esto es clave
 const app = express();
 
 app.use(express.json());

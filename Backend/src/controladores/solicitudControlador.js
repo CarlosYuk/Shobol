@@ -119,21 +119,27 @@ exports.listarPorCliente = async (req, res) => {
 
 // Obtener solicitudes con detalles del cliente, pedido y vehículo
 exports.obtenerSolicitudesCliente = async (req, res) => {
-  const usuarioId = req.usuario.id;
-  const solicitudes = await Solicitud.findAll({
-    where: { usuario_id: usuarioId },
-    include: [
-      {
-        model: Pedido,
-        as: "pedido",
-        include: [
-          {
-            model: Vehiculo,
-            as: "vehiculo",
-          },
-        ],
-      },
-    ],
-  });
-  res.json(solicitudes);
+  try {
+    const clienteId = req.user?.id || req.usuario?.id;
+    const solicitudes = await Solicitud.findAll({
+      where: { cliente_id: clienteId },
+      include: [
+        {
+          model: Pedido,
+          as: "pedido",
+          include: [
+            {
+              model: Vehiculo,
+              as: "vehiculo",
+            },
+          ],
+        },
+      ],
+    });
+    res.json(solicitudes);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al obtener solicitudes", detalle: error.message });
+  }
 };

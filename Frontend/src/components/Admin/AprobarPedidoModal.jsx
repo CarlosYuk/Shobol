@@ -20,7 +20,15 @@ const AprobarPedidoModal = ({ solicitud, onClose, onAprobado }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await ApiService.aprobarSolicitud(solicitud.id, form);
+      // Ajusta la fecha_entrega a mediodía para evitar desfase de zona horaria
+      const fechaEntregaISO = form.fecha_entrega
+        ? new Date(form.fecha_entrega + "T12:00:00").toISOString()
+        : null;
+
+      await ApiService.aprobarSolicitud(solicitud.id, {
+        ...form,
+        fecha_entrega: fechaEntregaISO,
+      });
       if (onAprobado) onAprobado();
       onClose();
     } catch (err) {
