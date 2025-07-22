@@ -15,7 +15,7 @@ const Usuario = sequelize.define(
       allowNull: false,
     },
     rol: {
-      type: DataTypes.ENUM("administrador", "gestor", "cliente"),
+      type: DataTypes.ENUM("administrador", "gestor", "cliente", "chofer"), // agrega "chofer"
       allowNull: false,
     },
     nombre: {

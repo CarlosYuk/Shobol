@@ -1,5 +1,6 @@
 const Vehiculo = require("../modelos/Vehiculo");
 const Pedido = require("../modelos/Pedido");
+const Chofer = require("../modelos/Chofer");
 
 // Listar vehículos
 exports.listar = async (req, res) => {
@@ -12,7 +13,15 @@ exports.crear = async (req, res) => {
   console.log("Entrando a crear vehículo");
   console.log("Body recibido:", req.body);
   try {
-    const { placa, modelo, anio, nombre_chofer, nombre_propietario, estado, numero_vehiculo } = req.body;
+    const {
+      placa,
+      modelo,
+      anio,
+      nombre_chofer,
+      nombre_propietario,
+      estado,
+      numero_vehiculo,
+    } = req.body;
     const existe = await Vehiculo.findOne({ where: { placa } });
     if (existe) return res.status(400).json({ mensaje: "La placa ya existe." });
 
@@ -38,8 +47,14 @@ exports.crear = async (req, res) => {
 exports.editar = async (req, res) => {
   try {
     const { id } = req.params;
-    const { modelo, anio, nombre_chofer, nombre_propietario, estado, numero_vehiculo } =
-      req.body;
+    const {
+      modelo,
+      anio,
+      nombre_chofer,
+      nombre_propietario,
+      estado,
+      numero_vehiculo,
+    } = req.body;
     const vehiculo = await Vehiculo.findByPk(id);
     if (!vehiculo)
       return res.status(404).json({ mensaje: "Vehículo no encontrado." });
@@ -105,7 +120,8 @@ exports.marcarPedidoEntregado = async (req, res) => {
   // Busca el pedido para obtener el vehículo asignado
   const pedido = await Pedido.findByPk(pedidoId);
 
-  if (pedido && pedido.vehiculo_id) { // <-- usa vehiculo_id
+  if (pedido && pedido.vehiculo_id) {
+    // <-- usa vehiculo_id
     // Marca el vehículo como disponible
     await Vehiculo.update(
       { estado: "disponible" },
@@ -120,4 +136,16 @@ exports.marcarPedidoEntregado = async (req, res) => {
 exports.obtenerVehiculosDisponibles = async (req, res) => {
   const vehiculos = await Vehiculo.findAll({ where: { estado: "disponible" } });
   res.json(vehiculos);
+};
+
+exports.obtenerUnidadesDisponibles = async (req, res) => {
+  try {
+    const unidades = await Vehiculo.findAll({
+      where: { chofer_id: null },
+      attributes: ["id", "numero_vehiculo"],
+    });
+    res.json(unidades);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener unidades disponibles" });
+  }
 };

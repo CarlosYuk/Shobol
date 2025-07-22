@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Mountain,
   Truck,
@@ -18,6 +18,13 @@ import RegisterModal from "./RegisterModal";
 const LandingPage = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [unidades, setUnidades] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/vehiculos/unidades-disponibles")
+      .then((res) => res.json())
+      .then((data) => setUnidades(data));
+  }, []);
 
   const services = [
     {
@@ -124,7 +131,7 @@ const LandingPage = () => {
                 de Piedra Caliza
               </h1>
               <p className="text-xl text-stone-600 mb-8 leading-relaxed">
-                Más de 15 años conectando canteras con la industria peruana.
+                Más de 15 años conectando canteras con la industria Ecuatoriana.
                 Especialistas en logística minera con la mayor flota de
                 transporte de piedra caliza del país.
               </p>
@@ -303,18 +310,40 @@ const LandingPage = () => {
             </div>
             <div className="bg-gradient-to-br from-emerald-50 to-lime-50 rounded-2xl p-8">
               <h3 className="text-2xl font-bold text-stone-900 mb-6">
-                Solicitar Información
+                Soy Conductor
               </h3>
-              <form className="space-y-6">
+              <form
+                className="space-y-6"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const formData = {
+                    nombre: e.target[0].value,
+                    apellido: e.target[1].value,
+                    empresa: e.target[2].value,
+                    numero_unidad: e.target[3].value,
+                    email: e.target[4].value,
+                    password: e.target[5].value,
+                  };
+                  await fetch("http://localhost:5000/api/choferes/agregar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData),
+                  });
+                  alert("Chofer registrado exitosamente. Espera aprobación del administrador.");
+                  e.target.reset();
+                }}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input
                     type="text"
                     placeholder="Nombre"
+                    required
                     className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                   <input
-                    type="email"
-                    placeholder="Email"
+                    type="text"
+                    placeholder="Apellido"
+                    required
                     className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
@@ -323,16 +352,36 @@ const LandingPage = () => {
                   placeholder="Empresa"
                   className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
-                <textarea
-                  placeholder="Mensaje"
-                  rows={4}
+                <select
+                  required
                   className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                ></textarea>
+                  name="numero_unidad"
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Seleccione una unidad
+                  </option>
+                  {unidades.map((unidad) => (
+                    <option key={unidad.id} value={unidad.numero_vehiculo}>
+                      {unidad.numero_vehiculo}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                />
+                <input
+                  type="password"
+                  placeholder="Contraseña"
+                  className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                />
                 <button
                   type="submit"
                   className="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-lime-600 hover:from-emerald-700 hover:to-lime-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
                 >
-                  Enviar Mensaje
+                  Enviar Solicitud
                 </button>
               </form>
             </div>
