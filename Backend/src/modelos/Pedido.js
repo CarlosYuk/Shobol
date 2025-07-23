@@ -42,6 +42,10 @@ const Pedido = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    chofer_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     tableName: "pedidos",

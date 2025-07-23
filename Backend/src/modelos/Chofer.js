@@ -6,7 +6,7 @@ const Chofer = sequelize.define("choferes", {
   apellido: { type: DataTypes.STRING, allowNull: false },
   empresa: { type: DataTypes.STRING },
   numero_unidad: { type: DataTypes.STRING },
-  usuario_id: { type: DataTypes.INTEGER }
+  usuario_id: { type: DataTypes.INTEGER, allowNull: false } // <-- obligatorio
 }, {
   tableName: "choferes",
   timestamps: false

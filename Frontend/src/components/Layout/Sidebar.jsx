@@ -38,7 +38,6 @@ const Sidebar = () => {
           { name: "Rutas", href: "/routes", icon: Route },
           { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck },
           { name: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
-          //{ name: "Configuración", href: "/settings", icon: Settings },
         ];
       case USER_ROLES.GESTOR:
         return [
@@ -48,8 +47,6 @@ const Sidebar = () => {
           { name: "Pedidos", href: "/dashboard/pedidos", icon: ClipboardList },
           { name: "Rutas", href: "/routes", icon: Route },
           { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck },
-          //{ name: "Seguimiento", href: "/tracking", icon: MapPin },
-          //{ name: "Reportes", href: "/reports", icon: BarChart3 },
         ];
       case USER_ROLES.CLIENT:
         return [
@@ -64,9 +61,17 @@ const Sidebar = () => {
             href: "/dashboard/nueva-solicitud",
             icon: Plus,
           },
-          // { name: "Mis Envíos", href: "/my-shipments", icon: Package },
           { name: "Seguimiento", href: "/tracking", icon: MapPin },
-          //{ name: "Historial", href: "/history", icon: BarChart3 },
+        ];
+      case USER_ROLES.CHOFER:
+        return [
+          ...baseItems,
+          {
+            name: "Mis Asignaciones",
+            href: "/dashboard/mis-asignaciones",
+            icon: ClipboardList,
+          },
+          
         ];
       default:
         return baseItems;

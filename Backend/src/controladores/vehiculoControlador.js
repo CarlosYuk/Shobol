@@ -96,18 +96,20 @@ exports.eliminar = async (req, res) => {
 exports.asignarVehiculoAPedido = async (req, res) => {
   const { pedidoId, vehiculoId } = req.body;
 
-  console.log("Body recibido:", req.body);
+  // Busca el vehículo y su chofer
+  const vehiculo = await Vehiculo.findByPk(vehiculoId);
+  if (!vehiculo) return res.status(404).json({ mensaje: "Vehículo no encontrado." });
 
-  // Asigna el vehículo al pedido
+  // Asigna el vehículo y el chofer al pedido
   await Pedido.update(
-    { vehiculo_id: vehiculoId, estado: "asignado" }, // <-- usa vehiculo_id
+    { vehiculo_id: vehiculoId, chofer_id: vehiculo.chofer_id, estado: "asignado" },
     { where: { id: pedidoId } }
   );
 
   // Marca el vehículo como ocupado
   await Vehiculo.update({ estado: "ocupado" }, { where: { id: vehiculoId } });
 
-  res.json({ mensaje: "Vehículo asignado y marcado como ocupado." });
+  res.json({ mensaje: "Vehículo y chofer asignados y marcados como ocupados." });
 };
 
 // Marcar pedido como entregado
@@ -147,5 +149,15 @@ exports.obtenerUnidadesDisponibles = async (req, res) => {
     res.json(unidades);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener unidades disponibles" });
+  }
+};
+
+// Obtener todos los vehículos
+exports.obtenerVehiculos = async (req, res) => {
+  try {
+    const vehiculos = await Vehiculo.findAll();
+    res.json(vehiculos);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener los vehículos" });
   }
 };

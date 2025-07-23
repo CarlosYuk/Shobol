@@ -149,6 +149,12 @@ exports.asignarVehiculoAPedido = async (req, res) => {
       return res.status(400).json({ error: "Vehículo no disponible" });
     }
 
+    // Busca el chofer asignado a este vehículo
+    const chofer_id = vehiculo.chofer_id;
+    if (!chofer_id) {
+      return res.status(400).json({ error: "El vehículo no tiene chofer asignado" });
+    }
+
     // LIBERAR VEHÍCULO ANTERIOR SI EXISTE
     if (pedido.vehiculo_id && pedido.vehiculo_id !== vehiculo.id) {
       const vehiculoAnterior = await Vehiculo.findByPk(pedido.vehiculo_id);
@@ -158,17 +164,18 @@ exports.asignarVehiculoAPedido = async (req, res) => {
       }
     }
 
-    // Asignar vehículo y cambiar estados
+    // Asignar vehículo y chofer, cambiar estados
     pedido.vehiculo_id = vehiculo.id;
+    pedido.chofer_id = chofer_id; // <-- asigna el chofer
     pedido.estado = "asignado";
     await pedido.save();
 
     vehiculo.estado = "ocupado";
     await vehiculo.save();
 
-    res.json({ mensaje: "Vehículo asignado correctamente", pedido });
+    res.json({ mensaje: "Vehículo y chofer asignados correctamente", pedido });
   } catch (error) {
-    res.status(400).json({ error: "Error al asignar vehículo" });
+    res.status(400).json({ error: "Error al asignar vehículo y chofer" });
   }
 };
 
@@ -193,5 +200,29 @@ exports.marcarPedidoEntregado = async (req, res) => {
     res.json({ mensaje: "Pedido entregado y vehículo liberado", pedido });
   } catch (error) {
     res.status(400).json({ error: "Error al marcar como entregado" });
+  }
+};
+
+// Obtener pedidos por chofer
+exports.obtenerPedidosPorChofer = async (req, res) => {
+  try {
+    const chofer_id = req.params.chofer_id;
+    const pedidos = await Pedido.findAll({
+      where: { chofer_id },
+      include: [
+        {
+          model: Vehiculo,
+          as: "vehiculo",
+          attributes: [
+            "numero_vehiculo",
+            "placa",
+            "nombre_propietario", // <-- asegúrate de incluir este campo
+          ],
+        },
+      ],
+    });
+    res.json(pedidos);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener los pedidos del chofer" });
   }
 };

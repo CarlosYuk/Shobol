@@ -101,12 +101,14 @@ const UsersTable = () => {
                   >
                     Editar
                   </button>
-                  <button
-                    onClick={() => handleDelete(u.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                  >
-                    Eliminar
-                  </button>
+                  {u.rol !== "chofer" && (
+                    <button
+                      onClick={() => handleDelete(u.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    >
+                      Eliminar
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -155,6 +157,7 @@ const UsersTable = () => {
               <option value="cliente">Cliente</option>
               <option value="gestor">Gestor</option>
               <option value="administrador">Administrador</option>
+              <option value="chofer">Chofer</option>
             </select>
             {!editingUser && (
               <input

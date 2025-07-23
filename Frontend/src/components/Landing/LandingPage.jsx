@@ -321,10 +321,10 @@ const LandingPage = () => {
                     apellido: e.target[1].value,
                     empresa: e.target[2].value,
                     numero_unidad: e.target[3].value,
-                    email: e.target[4].value,
-                    password: e.target[5].value,
+                    correo: e.target[4].value,         // <-- cambia 'email' por 'correo'
+                    contrasena: e.target[5].value,     // <-- cambia 'password' por 'contrasena'
                   };
-                  await fetch("http://localhost:5000/api/choferes/agregar", {
+                  await fetch("http://localhost:5000/api/choferes/registro-completo", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(formData),

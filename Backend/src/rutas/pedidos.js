@@ -17,4 +17,7 @@ router.get("/", pedidoCtrl.obtenerPedidos);
 // Obtener un pedido por su ID
 router.get("/:id", pedidoCtrl.obtenerPedidoPorId);
 
+// Obtener pedidos por chofer ID
+router.get("/chofer/:chofer_id", pedidoCtrl.obtenerPedidosPorChofer);
+
 module.exports = router;

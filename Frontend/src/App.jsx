@@ -20,9 +20,11 @@ import SolicitudForm from "./components/Cliente/SolicitudForm";
 import MyRequests from "./components/Cliente/MyRequests";
 import RecuperarContrasena from "./components/Landing/RecuperarContrasena";
 import Reportes from "./pages/Reportes";
+import ChoferAsignaciones from "./components/Chofer/ChoferAsignaciones"; // Agrega este import
+
 // Define los roles válidos para el sistema
 
-const ROLES_VALIDOS = ["administrador", "gestor", "cliente"];
+const ROLES_VALIDOS = ["administrador", "gestor", "cliente", "chofer"]; // Agrega "chofer"
 
 const AppRoutes = () => {
   const { user, loading } = useAuth(); // Asegúrate que tu AuthContext exponga loading
@@ -59,11 +61,14 @@ const AppRoutes = () => {
               <AdminDashboard />
             ) : user.rol === "gestor" ? (
               <GestorDashboard />
+            ) : user.rol === "chofer" ? (
+              <ChoferAsignaciones />
             ) : (
               <ClientDashboard />
             )
           }
         />
+        {/* Rutas para administrador y gestor */}
         {(user.rol === "administrador" || user.rol === "gestor") && (
           <Route path="usuarios" element={<UsersTable />} />
         )}
@@ -81,15 +86,18 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        {/* Ruta para chofer: Mis Asignaciones */}
+        {user.rol === "chofer" && (
+          <Route path="mis-asignaciones" element={<ChoferAsignaciones />} />
+        )}
         {user.rol === "cliente" && (
           <Route
-            path="/dashboard/nueva-solicitud"
+            path="nueva-solicitud"
             element={<SolicitudForm clienteId={user.id} />}
           />
         )}
         <Route path="my-requests" element={<MyRequests />} />
         <Route path="reports" element={<Reportes />} />
-        {/* ...otras rutas... */}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Route>
       <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
