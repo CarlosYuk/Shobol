@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const sequelize = require("./configuracion/basededatos");
 const usuariosRoutes = require("./rutas/usuarios");
 const authRutas = require("./rutas/auth");
-const vehiculosRouter = require("./rutas/vehiculos");
+const vehiculosRoutes = require("./rutas/vehiculos");
 const rutasRoutes = require("./rutas/rutas");
 const solicitudesRouter = require("./rutas/solicitudes");
 //const cargasRoutes = require("./rutas/cargas");
@@ -29,7 +29,7 @@ app.use(morgan("dev"));
 
 app.use("/api/auth", authRutas);
 app.use("/api", usuariosRoutes);
-app.use("/api/vehiculos", vehiculosRouter);
+app.use("/api/vehiculos", vehiculosRoutes);
 app.use("/api", rutasRoutes);
 app.use("/api/solicitudes", solicitudesRouter);
 //app.use("/api", cargasRoutes);

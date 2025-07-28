@@ -1,5 +1,5 @@
 const Usuario = require("../modelos/Usuario");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
 const crypto = require("crypto");
@@ -7,16 +7,24 @@ const nodemailer = require("nodemailer");
 // Registrar usuario (puedes enviar el rol desde el frontend si lo deseas)
 exports.registrar = async (req, res) => {
   try {
-    const { usuario, nombre, correo, contrasena, rol } = req.body;
-    // Hashea la contraseña UNA SOLA VEZ
-    const hash = await bcrypt.hash(contrasena, 10);
+    // Obtén los datos del cuerpo de la petición
+    const { usuario, nombre, correo, contrasena } = req.body;
+
+    // Asigna el rol según la lógica que ya tienes
+    const totalUsuarios = await Usuario.count();
+    let rol = "cliente";
+    if (totalUsuarios === 0) rol = "administrador";
+    else if (totalUsuarios === 1) rol = "gestor";
+
+    // Crea el usuario SIN hashear la contraseña aquí
     const nuevoUsuario = await Usuario.create({
       usuario,
       nombre,
       correo,
-      contrasena,
-      rol: rol || "cliente",
+      contrasena, // texto plano, el modelo lo hashea automáticamente
+      rol,
     });
+
     res.status(201).json(nuevoUsuario);
   } catch (error) {
     console.error(error);
@@ -77,7 +85,10 @@ exports.listarUsuarios = async (req, res) => {
 exports.solicitarRecuperacion = async (req, res) => {
   const { correo } = req.body;
   const usuario = await Usuario.findOne({ where: { correo } });
-  if (!usuario) return res.json({ mensaje: "Si el correo existe, recibirás instrucciones." });
+  if (!usuario)
+    return res.json({
+      mensaje: "Si el correo existe, recibirás instrucciones.",
+    });
 
   // Genera token único y fecha de expiración
   const token = crypto.randomBytes(32).toString("hex");
@@ -86,11 +97,13 @@ exports.solicitarRecuperacion = async (req, res) => {
   await usuario.save();
 
   // Envía email (configura tu transporter real)
-  const transporter = nodemailer.createTransport({ /* ... */ });
+  const transporter = nodemailer.createTransport({
+    /* ... */
+  });
   await transporter.sendMail({
     to: correo,
     subject: "Recupera tu contraseña",
-    text: `Haz clic aquí para restablecer tu contraseña: http://localhost:5173/restablecer-contrasena?token=${token}`
+    text: `Haz clic aquí para restablecer tu contraseña: http://localhost:5173/restablecer-contrasena?token=${token}`,
   });
 
   res.json({ mensaje: "Si el correo existe, recibirás instrucciones." });
@@ -101,12 +114,14 @@ exports.restablecerContrasena = async (req, res) => {
   const usuario = await Usuario.findOne({
     where: {
       tokenRecuperacion: token,
-      tokenExpira: { [Sequelize.Op.gt]: Date.now() }
-    }
+      tokenExpira: { [Sequelize.Op.gt]: Date.now() },
+    },
   });
-  if (!usuario) return res.status(400).json({ error: "Token inválido o expirado" });
+  if (!usuario)
+    return res.status(400).json({ error: "Token inválido o expirado" });
 
-  usuario.contrasena = contrasena; // El modelo la hasheará
+  // Hashea la nueva contraseña antes de guardar
+  usuario.contrasena = await bcrypt.hash(contrasena, 10);
   usuario.tokenRecuperacion = null;
   usuario.tokenExpira = null;
   await usuario.save();

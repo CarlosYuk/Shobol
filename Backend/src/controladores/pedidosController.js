@@ -1,4 +1,5 @@
 const Pedido = require("../modelos/Pedido");
+const Solicitud = require("../modelos/Solicitud");
 const Vehiculo = require("../modelos/Vehiculo");
 
 // Obtener todos los pedidos
@@ -152,7 +153,9 @@ exports.asignarVehiculoAPedido = async (req, res) => {
     // Busca el chofer asignado a este vehículo
     const chofer_id = vehiculo.chofer_id;
     if (!chofer_id) {
-      return res.status(400).json({ error: "El vehículo no tiene chofer asignado" });
+      return res
+        .status(400)
+        .json({ error: "El vehículo no tiene chofer asignado" });
     }
 
     // LIBERAR VEHÍCULO ANTERIOR SI EXISTE
@@ -211,18 +214,28 @@ exports.obtenerPedidosPorChofer = async (req, res) => {
       where: { chofer_id },
       include: [
         {
+          model: Solicitud,
+          as: "solicitud", // <--- Esto es clave
+          attributes: [
+            "nombreCliente",
+            "apellido",
+            "nombreEmpresa",
+            "lugar_entrega",
+          ],
+        },
+        {
           model: Vehiculo,
           as: "vehiculo",
           attributes: [
             "numero_vehiculo",
             "placa",
-            "nombre_propietario", // <-- asegúrate de incluir este campo
+            "nombre_propietario",
           ],
         },
       ],
     });
     res.json(pedidos);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener los pedidos del chofer" });
+    res.status(500).json({ error: "Error al obtener pedidos del chofer" });
   }
 };

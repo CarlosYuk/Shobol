@@ -94,56 +94,34 @@ const MyRequests = () => {
               <b>Estado Solicitud:</b> {detalle.estado}
             </p>
             {/* Mostrar detalles del pedido si existen */}
-            {detalle.pedido && (
+            {detalle.pedidos && detalle.pedidos.length > 0 && (
               <>
                 <hr className="my-2" />
                 <h4 className="font-semibold mb-1">Datos del Pedido</h4>
-                <p>
-                  <b>ID Pedido:</b> {detalle.pedido.id}
-                </p>
-                <p>
-                  <b>Cantidad (ton):</b> {detalle.pedido.cantidad_toneladas}
-                </p>
-                <p>
-                  <b>Dirección de Entrega:</b> {detalle.pedido.direccion_entrega}
-                </p>
-                <p>
-                  <b>Fecha de Entrega:</b> {detalle.pedido.fecha_entrega}
-                </p>
-                <p>
-                  <b>Estado Pedido:</b> {detalle.pedido.estado}
-                </p>
-                <p>
-                  <b>Mensaje:</b> {detalle.pedido.mensaje || "-"}
-                </p>
-                {/* Mostrar detalles del vehículo si existen */}
-                {detalle.pedido.vehiculo && (
-                  <>
-                    <hr className="my-2" />
-                    <h4 className="font-semibold mb-1">Vehículo Asignado</h4>
-                    <p>
-                      <b>Número Vehículo:</b> {detalle.pedido.vehiculo.numero_vehiculo}
-                    </p>
-                    <p>
-                      <b>Placa:</b> {detalle.pedido.vehiculo.placa}
-                    </p>
-                    <p>
-                      <b>Modelo:</b> {detalle.pedido.vehiculo.modelo}
-                    </p>
-                    <p>
-                      <b>Año:</b> {detalle.pedido.vehiculo.anio}
-                    </p>
-                    <p>
-                      <b>Chofer:</b> {detalle.pedido.vehiculo.nombre_chofer}
-                    </p>
-                    <p>
-                      <b>Propietario:</b> {detalle.pedido.vehiculo.nombre_propietario}
-                    </p>
-                    <p>
-                      <b>Estado Vehículo:</b> {detalle.pedido.vehiculo.estado}
-                    </p>
-                  </>
-                )}
+                {detalle.pedidos.map((pedido) => (
+                  <div key={pedido.id}>
+                    <p><b>ID Pedido:</b> {pedido.id}</p>
+                    <p><b>Cantidad (ton):</b> {pedido.cantidad_toneladas}</p>
+                    <p><b>Dirección de Entrega:</b> {pedido.direccion_entrega}</p>
+                    <p><b>Fecha de Entrega:</b> {pedido.fecha_entrega}</p>
+                    <p><b>Estado Pedido:</b> {pedido.estado}</p>
+                    <p><b>Mensaje:</b> {pedido.mensaje || "-"}</p>
+                    {/* Mostrar detalles del vehículo si existen */}
+                    {pedido.vehiculo && (
+                      <>
+                        <hr className="my-2" />
+                        <h4 className="font-semibold mb-1">Vehículo Asignado</h4>
+                        <p><b>Número Vehículo:</b> {pedido.vehiculo.numero_vehiculo}</p>
+                        <p><b>Placa:</b> {pedido.vehiculo.placa}</p>
+                        <p><b>Modelo:</b> {pedido.vehiculo.modelo}</p>
+                        <p><b>Año:</b> {pedido.vehiculo.anio}</p>
+                        <p><b>Chofer:</b> {pedido.vehiculo.nombre_chofer}</p>
+                        <p><b>Propietario:</b> {pedido.vehiculo.nombre_propietario}</p>
+                        <p><b>Estado Vehículo:</b> {pedido.vehiculo.estado}</p>
+                      </>
+                    )}
+                  </div>
+                ))}
               </>
             )}
             <button

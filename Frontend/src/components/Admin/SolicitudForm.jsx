@@ -3,6 +3,11 @@ import React, { useState } from "react";
 import ApiService from "../../services/api";
 
 const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
+  const [nombreCliente, setNombreCliente] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [nombreEmpresa, setNombreEmpresa] = useState("");
+  const [lugarEntrega, setLugarEntrega] = useState("");
+  const [numeroViajes, setNumeroViajes] = useState(1);
   const [observaciones, setObservaciones] = useState("");
   const [modalSolicitud, setModalSolicitud] = useState(null);
 
@@ -11,8 +16,18 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
     try {
       await ApiService.createSolicitud({
         cliente_id: clienteId,
+        nombreCliente,
+        apellido,
+        nombreEmpresa,
+        lugar_entrega: lugarEntrega,
+        numero_viajes: Number(numeroViajes),
         observaciones,
       });
+      setNombreCliente("");
+      setApellido("");
+      setNombreEmpresa("");
+      setLugarEntrega("");
+      setNumeroViajes(1);
       setObservaciones("");
       if (onSolicitudCreada) onSolicitudCreada();
       alert("Solicitud registrada correctamente");
@@ -24,6 +39,42 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
   return (
     <form onSubmit={handleSubmit}>
       <h3>Registrar nueva solicitud</h3>
+      <input
+        type="text"
+        placeholder="Nombre"
+        value={nombreCliente}
+        onChange={(e) => setNombreCliente(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Apellido"
+        value={apellido}
+        onChange={(e) => setApellido(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Nombre de la empresa"
+        value={nombreEmpresa}
+        onChange={(e) => setNombreEmpresa(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Lugar de entrega"
+        value={lugarEntrega}
+        onChange={(e) => setLugarEntrega(e.target.value)}
+        required
+      />
+      <input
+        type="number"
+        min={1}
+        placeholder="Número de viajes"
+        value={numeroViajes}
+        onChange={(e) => setNumeroViajes(e.target.value)}
+        required
+      />
       <textarea
         placeholder="Observaciones"
         value={observaciones}

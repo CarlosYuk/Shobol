@@ -20,24 +20,31 @@ function SolicitudesTable() {
       <table>
         <thead>
           <tr>
-            <th>ID</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Observaciones</th><th>Acción</th>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Observaciones</th>
+            <th>Acción</th>
           </tr>
         </thead>
         <tbody>
-          {solicitudes.filter(s => s.estado === "pendiente").map((s) => (
-            <tr key={s.id}>
-              <td>{s.id}</td>
-              <td>{s.cliente_id}</td>
-              <td>{s.fecha_solicitud}</td>
-              <td>{s.estado}</td>
-              <td>{s.observaciones}</td>
-              <td>
-                <button onClick={() => setModalSolicitud(s)}>
-                  Aprobar y crear pedido
-                </button>
-              </td>
-            </tr>
-          ))}
+          {solicitudes
+            .filter((s) => s.estado === "pendiente")
+            .map((s) => (
+              <tr key={s.id}>
+                <td>{s.id}</td>
+                <td>{s.cliente_id}</td>
+                <td>{s.fecha_solicitud}</td>
+                <td>{s.estado}</td>
+                <td>{s.observaciones}</td>
+                <td>
+                  <button onClick={() => setModalSolicitud(s)}>
+                    Aprobar y crear pedido
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
       {modalSolicitud && (

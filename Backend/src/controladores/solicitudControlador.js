@@ -17,18 +17,31 @@ exports.listar = async (req, res) => {
 // Crear solicitud
 exports.crear = async (req, res) => {
   try {
-    const clienteId = req.user.id; // El id del cliente autenticado
-    const { fecha_solicitud, observaciones } = req.body;
+    console.log("Datos recibidos:", req.body); // <-- Agrega esto
+    const clienteId = req.user.id;
+    const {
+      nombreCliente,
+      apellido,
+      nombreEmpresa,
+      lugar_entrega,
+      numero_viajes,
+      observaciones,
+    } = req.body;
     const solicitud = await Solicitud.create({
       cliente_id: clienteId,
-      fecha_solicitud,
-      observaciones,
+      nombreCliente,
+      apellido,
+      nombreEmpresa,
+      lugar_entrega,
+      numero_viajes,
+      fecha_solicitud: new Date(),
       estado: "pendiente",
-      mensajeRespuesta: null,
+      observaciones,
+      mensajeRespuesta: null, // Siempre null al crear
     });
     res.status(201).json(solicitud);
   } catch (error) {
-    console.error(error); // <-- Esto te mostrará el error real en consola
+    console.error("Error detallado:", error); // Esto imprime el error real en la consola
     res.status(500).json({ error: "Error al crear solicitud" });
   }
 };
@@ -95,7 +108,7 @@ exports.rechazarSolicitud = async (req, res) => {
       return res.status(404).json({ error: "Solicitud no encontrada" });
 
     solicitud.estado = "rechazada";
-    solicitud.mensajeRespuesta = `Solicitud rechazada: ${req.body.motivo}`;
+    solicitud.mensajeRespuesta = req.body.motivo || "Solicitud rechazada";
     await solicitud.save();
 
     res.json({ mensaje: "Solicitud rechazada", solicitud });
@@ -126,7 +139,7 @@ exports.obtenerSolicitudesCliente = async (req, res) => {
       include: [
         {
           model: Pedido,
-          as: "pedido",
+          as: "pedidos", // <-- Debe ser plural, igual que en asociaciones.js
           include: [
             {
               model: Vehiculo,

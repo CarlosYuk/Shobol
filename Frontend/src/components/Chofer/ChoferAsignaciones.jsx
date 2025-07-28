@@ -59,6 +59,18 @@ const ChoferAsignaciones = () => {
                 <strong>Pedido:</strong> {pedido.id}
               </div>
               <div>
+                <strong>Cliente:</strong> {pedido.solicitud?.nombreCliente}
+              </div>
+              <div>
+                <strong>Apellido:</strong> {pedido.solicitud?.apellido}
+              </div>
+              <div>
+                <strong>Empresa:</strong> {pedido.solicitud?.nombreEmpresa}
+              </div>
+              <div>
+                <strong>Lugar de entrega:</strong> {pedido.solicitud?.lugar_entrega}
+              </div>
+              <div>
                 <strong>Estado:</strong> {pedido.estado}
               </div>
               <div>

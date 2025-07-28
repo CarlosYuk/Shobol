@@ -1,10 +1,30 @@
 const { DataTypes } = require("sequelize");
-const db = require("../configuracion/basededatos"); // Asegúrate que este archivo existe y exporta la instancia de Sequelize
+const db = require("../configuracion/basededatos");
 
 const Solicitud = db.define(
   "Solicitud",
   {
     cliente_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    nombreCliente: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    apellido: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    nombreEmpresa: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    lugar_entrega: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    numero_viajes: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -20,11 +40,6 @@ const Solicitud = db.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    motivoRechazo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      field: "motivoRechazo", // coincide con la BD
-    },
     mensajeRespuesta: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -33,7 +48,7 @@ const Solicitud = db.define(
   },
   {
     tableName: "solicitudes",
-    timestamps: false, // o true si usas createdAt/updatedAt
+    timestamps: false,
   }
 );
 

@@ -52,7 +52,6 @@ const RequestsTable = () => {
     try {
       await aceptarSolicitud(solicitud.id);
       setMensaje({ tipo: "exito", texto: "Solicitud aceptada correctamente." });
-      // Recarga la lista
       cargarSolicitudes();
     } catch {
       setMensaje({ tipo: "error", texto: "Error al aceptar la solicitud." });
@@ -107,6 +106,18 @@ const RequestsTable = () => {
                 Cliente
               </th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                Apellido
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                Empresa
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                Lugar Entrega
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                N° Viajes
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
                 Fecha
               </th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
@@ -124,12 +135,17 @@ const RequestsTable = () => {
             {solicitudes.map((s) => (
               <tr key={s.id}>
                 <td className="px-4 py-2">{s.id}</td>
-                <td className="px-4 py-2">{s.cliente_id}</td>
+                <td className="px-4 py-2">{s.nombreCliente}</td>
+                <td className="px-4 py-2">{s.apellido}</td>
+                <td className="px-4 py-2">{s.nombreEmpresa}</td>
+                <td className="px-4 py-2">{s.lugar_entrega}</td>
+                <td className="px-4 py-2">{s.numero_viajes}</td>
                 <td className="px-4 py-2">
                   {new Date(s.fecha_solicitud).toLocaleString()}
                 </td>
                 <td className="px-4 py-2 capitalize">{s.estado}</td>
                 <td className="px-4 py-2">{s.observaciones}</td>
+
                 <td className="px-4 py-2">
                   {s.estado === "pendiente" && (
                     <div className="flex flex-col gap-2">
@@ -145,13 +161,6 @@ const RequestsTable = () => {
                       >
                         Rechazar
                       </button>
-                      {/* Ejemplo de botón eliminar */}
-                      {/* <button
-                        className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded transition"
-                        onClick={() => eliminarSolicitud(s.id)}
-                      >
-                        Eliminar
-                      </button> */}
                     </div>
                   )}
                 </td>

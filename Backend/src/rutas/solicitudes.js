@@ -17,15 +17,30 @@ router.get("/solicitudes", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { cliente_id, observaciones } = req.body;
+    const {
+      cliente_id,
+      nombreCliente,
+      apellido,
+      nombreEmpresa,
+      lugar_entrega,
+      numero_viajes,
+      observaciones,
+    } = req.body;
     const nuevaSolicitud = await Solicitud.create({
       cliente_id,
+      nombreCliente,
+      apellido,
+      nombreEmpresa,
+      lugar_entrega,
+      numero_viajes,
       fecha_solicitud: new Date(),
       estado: "pendiente",
       observaciones,
+      mensajeRespuesta: null,
     });
     res.status(201).json(nuevaSolicitud);
   } catch (error) {
+    console.error("Error detallado:", error);
     res.status(500).json({ error: "Error al crear la solicitud" });
   }
 });
@@ -43,7 +58,6 @@ router.put("/:id/aprobar", async (req, res) => {
     const {
       material,
       cantidad_toneladas,
-      direccion_entrega,
       fecha_entrega,
       volumen,
       tipo_carga,
@@ -52,29 +66,34 @@ router.put("/:id/aprobar", async (req, res) => {
     if (
       !material ||
       !cantidad_toneladas ||
-      !direccion_entrega ||
+      !solicitud.lugar_entrega ||
       !fecha_entrega
     ) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
-    const pedido = await Pedido.create({
-      solicitud_id: solicitud.id,
-      cliente_id: solicitud.cliente_id,
-      material,
-      cantidad_toneladas,
-      direccion_entrega,
-      fecha_entrega,
-      volumen,
-      tipo_carga,
-    });
+    // Crear varios pedidos según el número de viajes
+    const pedidos = [];
+    for (let i = 0; i < solicitud.numero_viajes; i++) {
+      const pedido = await Pedido.create({
+        solicitud_id: solicitud.id,
+        cliente_id: solicitud.cliente_id,
+        material,
+        cantidad_toneladas,
+        direccion_entrega: solicitud.lugar_entrega,
+        fecha_entrega,
+        volumen,
+        tipo_carga,
+      });
+      pedidos.push(pedido);
+    }
 
-    res.json({ solicitud, pedido });
+    res.json({ solicitud, pedidos });
   } catch (error) {
-    console.error("Error al crear pedido:", error);
+    console.error("Error al crear pedidos:", error);
     res
       .status(500)
-      .json({ error: "Error al aprobar la solicitud y crear el pedido" });
+      .json({ error: "Error al aprobar la solicitud y crear los pedidos" });
   }
 });
 
@@ -85,12 +104,17 @@ router.get("/cliente", verificarToken, solicitudControlador.obtenerSolicitudesCl
 
 // Obtener solicitudes con filtro opcional por cliente
 router.get("/", async (req, res) => {
-  // Si quieres filtrar por cliente solo cuando se pasa un parámetro
-  const { cliente_id } = req.query;
-  let where = {};
-  if (cliente_id) where.cliente_id = cliente_id;
-  const solicitudes = await Solicitud.findAll({ where });
-  res.json(solicitudes);
+  try {
+    // Si usas autenticación, filtra por el cliente
+    // const solicitudes = await Solicitud.findAll({ where: { cliente_id: req.user.id } });
+
+    // Si no usas autenticación, trae todas
+    const solicitudes = await Solicitud.findAll();
+    res.json(solicitudes);
+  } catch (error) {
+    console.error("Error al obtener solicitudes:", error);
+    res.status(500).json({ error: "Error al obtener solicitudes" });
+  }
 });
 
 module.exports = router;

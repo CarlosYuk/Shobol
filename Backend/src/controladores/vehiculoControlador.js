@@ -10,8 +10,6 @@ exports.listar = async (req, res) => {
 
 // Crear vehículo (sólo admin o gestor)
 exports.crear = async (req, res) => {
-  console.log("Entrando a crear vehículo");
-  console.log("Body recibido:", req.body);
   try {
     const {
       placa,
@@ -25,7 +23,7 @@ exports.crear = async (req, res) => {
     const existe = await Vehiculo.findOne({ where: { placa } });
     if (existe) return res.status(400).json({ mensaje: "La placa ya existe." });
 
-    const nuevo = await Vehiculo.create({
+    const nuevoVehiculo = await Vehiculo.create({
       placa,
       modelo,
       anio,
@@ -33,8 +31,9 @@ exports.crear = async (req, res) => {
       nombre_propietario,
       estado,
       numero_vehiculo,
+      chofer_id: null, // Al crear, no se asigna chofer
     });
-    res.status(201).json(nuevo);
+    res.status(201).json(nuevoVehiculo);
   } catch (error) {
     console.error("Error al crear vehículo:", error);
     res
