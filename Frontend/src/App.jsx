@@ -20,7 +20,9 @@ import SolicitudForm from "./components/Cliente/SolicitudForm";
 import MyRequests from "./components/Cliente/MyRequests";
 import RecuperarContrasena from "./components/Landing/RecuperarContrasena";
 import Reportes from "./pages/Reportes";
-import ChoferAsignaciones from "./components/Chofer/ChoferAsignaciones"; // Agrega este import
+import ChoferAsignaciones from "./components/Chofer/ChoferAsignaciones";
+import MapaUbicacion from "./components/Chofer/MapaUbicacion";
+import DashboardChofer from "./components/Dashboard/DashboardChofer"; // Asegúrate de importar el nuevo componente
 
 // Define los roles válidos para el sistema
 
@@ -88,7 +90,10 @@ const AppRoutes = () => {
         />
         {/* Ruta para chofer: Mis Asignaciones */}
         {user.rol === "chofer" && (
-          <Route path="mis-asignaciones" element={<ChoferAsignaciones />} />
+          <Route
+            path="/dashboard/mis-asignaciones"
+            element={<ChoferAsignaciones />}
+          />
         )}
         {user.rol === "cliente" && (
           <Route
@@ -102,6 +107,9 @@ const AppRoutes = () => {
       </Route>
       <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
       <Route path="*" element={<Navigate to="/dashboard" />} />
+      <Route path="/dashboard/mi-ubicacion" element={<MapaUbicacion />} />
+      <Route path="/dashboard" element={<DashboardChofer />} />{" "}
+      {/* Nueva ruta para DashboardChofer */}
     </Routes>
   );
 };
