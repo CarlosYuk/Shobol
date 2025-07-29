@@ -239,3 +239,27 @@ exports.obtenerPedidosPorChofer = async (req, res) => {
     res.status(500).json({ error: "Error al obtener pedidos del chofer" });
   }
 };
+
+// Obtener el pedido activo del chofer autenticado
+exports.obtenerPedidoActivoChofer = async (req, res) => {
+  try {
+    console.log("Usuario autenticado:", req.usuario);
+    const chofer_id = req.usuario.id;
+    const estadosActivos = ["en camino", "pendiente", "asignado"];
+    const pedido = await Pedido.findOne({
+      where: {
+        chofer_id,
+        estado: estadosActivos,
+      },
+      order: [["creado_en", "DESC"]],
+    });
+    console.log("Pedido encontrado:", pedido);
+    if (!pedido) {
+      return res.status(404).json({ error: "No tienes un pedido activo asignado." });
+    }
+    res.json(pedido);
+  } catch (error) {
+    console.error("Error en obtenerPedidoActivoChofer:", error);
+    res.status(500).json({ error: "Error al buscar pedido activo" });
+  }
+};

@@ -23,6 +23,8 @@ import Reportes from "./pages/Reportes";
 import ChoferAsignaciones from "./components/Chofer/ChoferAsignaciones";
 import MapaUbicacion from "./components/Chofer/MapaUbicacion";
 import DashboardChofer from "./components/Dashboard/DashboardChofer"; // Asegúrate de importar el nuevo componente
+import SeguimientoPedido from "./components/Cliente/SeguimientoPedido";
+import SeguimientoPedidoWrapper from "./components/Cliente/SeguimientoPedidoWrapper";
 
 // Define los roles válidos para el sistema
 
@@ -110,6 +112,10 @@ const AppRoutes = () => {
       <Route path="/dashboard/mi-ubicacion" element={<MapaUbicacion />} />
       <Route path="/dashboard" element={<DashboardChofer />} />{" "}
       {/* Nueva ruta para DashboardChofer */}
+      <Route
+        path="/dashboard/seguimiento/:pedidoId"
+        element={<SeguimientoPedidoWrapper />}
+      />
     </Routes>
   );
 };

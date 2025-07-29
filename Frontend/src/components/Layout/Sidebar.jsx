@@ -61,7 +61,7 @@ const Sidebar = () => {
             href: "/dashboard/nueva-solicitud",
             icon: Plus,
           },
-          { name: "Seguimiento", href: "/tracking", icon: MapPin },
+          // { name: "Seguimiento", href: "/tracking", icon: MapPin },
         ];
       case USER_ROLES.CHOFER:
         return [

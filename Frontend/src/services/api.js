@@ -224,3 +224,15 @@ export async function restablecerContrasena(token, contrasena) {
     body: JSON.stringify({ token, contrasena }),
   });
 }
+
+export const enviarUbicacion = async ({ pedido_id, lat, lng }) => {
+  const token = localStorage.getItem("token");
+  return fetch("http://localhost:5000/api/ubicaciones", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ pedido_id, lat, lng }),
+  });
+};

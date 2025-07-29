@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getSolicitudesCliente } from "../../services/api";
+import { Link } from "react-router-dom";
 
 const MyRequests = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -50,7 +51,9 @@ const MyRequests = () => {
                 ) : s.estado === "rechazada" ? (
                   s.mensajeRespuesta
                 ) : (
-                  "En revisión"
+                  <Link to={`/dashboard/seguimiento/${s.id}`}>
+                    Ver seguimiento
+                  </Link>
                 )}
               </td>
             </tr>
@@ -83,7 +86,9 @@ const MyRequests = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold mb-2">Detalles de la Solicitud</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Detalles de la Solicitud
+            </h3>
             <p>
               <b>Fecha Solicitud:</b> {detalle.fecha_solicitud || detalle.fecha}
             </p>
@@ -100,26 +105,62 @@ const MyRequests = () => {
                 <h4 className="font-semibold mb-1">Datos del Pedido</h4>
                 {detalle.pedidos.map((pedido) => (
                   <div key={pedido.id}>
-                    <p><b>ID Pedido:</b> {pedido.id}</p>
-                    <p><b>Cantidad (ton):</b> {pedido.cantidad_toneladas}</p>
-                    <p><b>Dirección de Entrega:</b> {pedido.direccion_entrega}</p>
-                    <p><b>Fecha de Entrega:</b> {pedido.fecha_entrega}</p>
-                    <p><b>Estado Pedido:</b> {pedido.estado}</p>
-                    <p><b>Mensaje:</b> {pedido.mensaje || "-"}</p>
+                    <p>
+                      <b>ID Pedido:</b> {pedido.id}
+                    </p>
+                    <p>
+                      <b>Cantidad (ton):</b> {pedido.cantidad_toneladas}
+                    </p>
+                    <p>
+                      <b>Dirección de Entrega:</b> {pedido.direccion_entrega}
+                    </p>
+                    <p>
+                      <b>Fecha de Entrega:</b> {pedido.fecha_entrega}
+                    </p>
+                    <p>
+                      <b>Estado Pedido:</b> {pedido.estado}
+                    </p>
+                    <p>
+                      <b>Mensaje:</b> {pedido.mensaje || "-"}
+                    </p>
                     {/* Mostrar detalles del vehículo si existen */}
                     {pedido.vehiculo && (
                       <>
                         <hr className="my-2" />
-                        <h4 className="font-semibold mb-1">Vehículo Asignado</h4>
-                        <p><b>Número Vehículo:</b> {pedido.vehiculo.numero_vehiculo}</p>
-                        <p><b>Placa:</b> {pedido.vehiculo.placa}</p>
-                        <p><b>Modelo:</b> {pedido.vehiculo.modelo}</p>
-                        <p><b>Año:</b> {pedido.vehiculo.anio}</p>
-                        <p><b>Chofer:</b> {pedido.vehiculo.nombre_chofer}</p>
-                        <p><b>Propietario:</b> {pedido.vehiculo.nombre_propietario}</p>
-                        <p><b>Estado Vehículo:</b> {pedido.vehiculo.estado}</p>
+                        <h4 className="font-semibold mb-1">
+                          Vehículo Asignado
+                        </h4>
+                        <p>
+                          <b>Número Vehículo:</b>{" "}
+                          {pedido.vehiculo.numero_vehiculo}
+                        </p>
+                        <p>
+                          <b>Placa:</b> {pedido.vehiculo.placa}
+                        </p>
+                        <p>
+                          <b>Modelo:</b> {pedido.vehiculo.modelo}
+                        </p>
+                        <p>
+                          <b>Año:</b> {pedido.vehiculo.anio}
+                        </p>
+                        <p>
+                          <b>Chofer:</b> {pedido.vehiculo.nombre_chofer}
+                        </p>
+                        <p>
+                          <b>Propietario:</b>{" "}
+                          {pedido.vehiculo.nombre_propietario}
+                        </p>
+                        <p>
+                          <b>Estado Vehículo:</b> {pedido.vehiculo.estado}
+                        </p>
                       </>
                     )}
+                    <Link
+                      to={`/dashboard/seguimiento/${pedido.id}`}
+                      className="text-blue-500 hover:underline"
+                    >
+                      Ver seguimiento
+                    </Link>
                   </div>
                 ))}
               </>
