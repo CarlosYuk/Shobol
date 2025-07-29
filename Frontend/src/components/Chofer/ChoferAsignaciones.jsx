@@ -3,31 +3,20 @@ import { useAuth } from "../../context/AuthContext";
 
 const ChoferAsignaciones = () => {
   const { user } = useAuth();
-  const [choferId, setChoferId] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Buscar el chofer_id usando el usuario_id
+  // Buscar los pedidos asignados a este chofer (usuario)
   useEffect(() => {
     if (!user?.id) return;
-    fetch(`http://localhost:5000/api/choferes/usuario/${user.id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.id) setChoferId(data.id);
-      });
-  }, [user]);
-
-  // Buscar los pedidos asignados a ese chofer
-  useEffect(() => {
-    if (!choferId) return;
     setLoading(true);
-    fetch(`http://localhost:5000/api/pedidos/chofer/${choferId}`)
+    fetch(`http://localhost:5000/api/pedidos/chofer/${user.id}`)
       .then((res) => res.json())
       .then((data) => {
         setPedidos(Array.isArray(data) ? data : []);
         setLoading(false);
       });
-  }, [choferId]);
+  }, [user]);
 
   // Acción para marcar como entregado
   const marcarEntregado = async (pedidoId) => {

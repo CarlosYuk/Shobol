@@ -151,8 +151,10 @@ exports.asignarVehiculoAPedido = async (req, res) => {
     }
 
     // Busca el chofer asignado a este vehículo
-    const chofer_id = vehiculo.chofer_id;
-    if (!chofer_id) {
+    const chofer = await require("../modelos/Chofer").findByPk(
+      vehiculo.chofer_id
+    );
+    if (!chofer) {
       return res
         .status(400)
         .json({ error: "El vehículo no tiene chofer asignado" });
@@ -169,7 +171,7 @@ exports.asignarVehiculoAPedido = async (req, res) => {
 
     // Asignar vehículo y chofer, cambiar estados
     pedido.vehiculo_id = vehiculo.id;
-    pedido.chofer_id = chofer_id; // <-- asigna el chofer
+    pedido.chofer_id = chofer.usuario_id; // <-- asigna el usuario_id del chofer
     pedido.estado = "asignado";
     await pedido.save();
 
@@ -226,11 +228,7 @@ exports.obtenerPedidosPorChofer = async (req, res) => {
         {
           model: Vehiculo,
           as: "vehiculo",
-          attributes: [
-            "numero_vehiculo",
-            "placa",
-            "nombre_propietario",
-          ],
+          attributes: ["numero_vehiculo", "placa", "nombre_propietario"],
         },
       ],
     });
@@ -255,7 +253,9 @@ exports.obtenerPedidoActivoChofer = async (req, res) => {
     });
     console.log("Pedido encontrado:", pedido);
     if (!pedido) {
-      return res.status(404).json({ error: "No tienes un pedido activo asignado." });
+      return res
+        .status(404)
+        .json({ error: "No tienes un pedido activo asignado." });
     }
     res.json(pedido);
   } catch (error) {
