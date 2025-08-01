@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { NotificacionesProvider } from "./context/NotificacionesContext";
 import LandingPage from "./components/Landing/LandingPage";
 import DashboardLayout from "./components/Layout/DashboardLayout";
 import AdminDashboard from "./components/Dashboard/AdminDashboard";
@@ -123,9 +124,11 @@ const AppRoutes = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <NotificacionesProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </NotificacionesProvider>
     </AuthProvider>
   );
 }

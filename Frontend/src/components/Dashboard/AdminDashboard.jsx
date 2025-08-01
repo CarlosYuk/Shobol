@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import StatCard from "./StatCard";
 import {
   Users,
@@ -10,6 +10,14 @@ import {
 } from "lucide-react";
 
 const AdminDashboard = () => {
+  const [mensajes, setMensajes] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/mensajes")
+      .then((res) => res.json())
+      .then(setMensajes);
+  }, []);
+
   const stats = [
     {
       title: "Total Usuarios",
@@ -190,6 +198,24 @@ const AdminDashboard = () => {
             <div className="text-3xl font-bold text-amber-600">4.8/5</div>
             <div className="text-sm text-stone-600">Satisfacción Cliente</div>
           </div>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+        <h2 className="text-lg font-semibold text-stone-900 mb-4">
+          Notificaciones
+        </h2>
+        <div className="space-y-3">
+          {mensajes.filter((m) => !m.leido).map((m) => (
+            <div
+              key={m.id}
+              className="flex items-center justify-between p-3 bg-amber-100 rounded-lg"
+            >
+              <span className="text-sm text-stone-900">{m.texto}</span>
+              <span className="text-xs text-stone-400">{m.fecha}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -7,4 +7,8 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  build: {
+    outDir: '../docs', // Esto hará que el build salga en la carpeta docs en la raíz del repo
+    emptyOutDir: true,
+  },
 });

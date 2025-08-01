@@ -19,6 +19,7 @@ const LandingPage = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [unidades, setUnidades] = useState([]);
+  const [showInfoForm, setShowInfoForm] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/vehiculos/unidades-disponibles")
@@ -143,8 +144,12 @@ const LandingPage = () => {
                   <span>Solicitar Cotización</span>
                   <ChevronRight className="h-5 w-5" />
                 </button>
-                <button className="px-8 py-4 border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-semibold rounded-xl transition-all">
-                  Conocer Más
+                <button
+                  onClick={() => setShowInfoForm(true)}
+                  className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-lime-600 hover:from-emerald-700 hover:to-lime-700 text-white font-semibold rounded-xl transition-all transform hover:scale-105 shadow-xl flex items-center justify-center space-x-2"
+                >
+                  <span>Solicitar Información</span>
+                  <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
             </div>
@@ -321,15 +326,20 @@ const LandingPage = () => {
                     apellido: e.target[1].value,
                     empresa: e.target[2].value,
                     numero_unidad: e.target[3].value,
-                    correo: e.target[4].value,         // <-- cambia 'email' por 'correo'
-                    contrasena: e.target[5].value,     // <-- cambia 'password' por 'contrasena'
+                    correo: e.target[4].value, // <-- cambia 'email' por 'correo'
+                    contrasena: e.target[5].value, // <-- cambia 'password' por 'contrasena'
                   };
-                  await fetch("http://localhost:5000/api/choferes/registro-completo", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData),
-                  });
-                  alert("Chofer registrado exitosamente. Espera aprobación del administrador.");
+                  await fetch(
+                    "http://localhost:5000/api/choferes/registro-completo",
+                    {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(formData),
+                    }
+                  );
+                  alert(
+                    "Chofer registrado exitosamente. Espera aprobación del administrador."
+                  );
                   e.target.reset();
                 }}
               >
@@ -438,6 +448,65 @@ const LandingPage = () => {
       {/* Modals */}
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
       {showRegister && <RegisterModal onClose={() => setShowRegister(false)} />}
+      {showInfoForm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <form
+            className="bg-white p-8 rounded-xl shadow-xl space-y-4 w-full max-w-md"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const nombre = e.target.nombre.value;
+              const email = e.target.email.value;
+              const mensaje = e.target.mensaje.value;
+              await fetch("http://localhost:5000/api/mensajes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombre, email, mensaje }),
+              });
+              alert(
+                "Mensaje enviado correctamente. Pronto nos pondremos en contacto."
+              );
+              setShowInfoForm(false);
+            }}
+          >
+            <h2 className="text-xl font-bold mb-2">Solicitar Información</h2>
+            <input
+              name="nombre"
+              type="text"
+              placeholder="Tu nombre"
+              required
+              className="w-full px-4 py-2 border rounded"
+            />
+            <input
+              name="email"
+              type="email"
+              placeholder="Tu email"
+              required
+              className="w-full px-4 py-2 border rounded"
+            />
+            <textarea
+              name="mensaje"
+              placeholder="Tu mensaje"
+              required
+              className="w-full px-4 py-2 border rounded"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowInfoForm(false)}
+                className="px-4 py-2 bg-stone-200 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-emerald-600 text-white rounded"
+              >
+                Enviar
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

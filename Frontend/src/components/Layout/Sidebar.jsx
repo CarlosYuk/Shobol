@@ -35,7 +35,7 @@ const Sidebar = () => {
           { name: "Usuarios", href: "/dashboard/usuarios", icon: Users },
           { name: "Solicitudes", href: "/dashboard/requests", icon: FileText },
           { name: "Pedidos", href: "/dashboard/pedidos", icon: ClipboardList },
-          { name: "Rutas", href: "/routes", icon: Route },
+          //{ name: "Rutas", href: "/routes", icon: Route },
           { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck },
           { name: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
         ];
@@ -45,7 +45,7 @@ const Sidebar = () => {
           { name: "Usuarios", href: "/dashboard/usuarios", icon: Users },
           { name: "Solicitudes", href: "/dashboard/requests", icon: FileText },
           { name: "Pedidos", href: "/dashboard/pedidos", icon: ClipboardList },
-          { name: "Rutas", href: "/routes", icon: Route },
+          //{ name: "Rutas", href: "/routes", icon: Route },
           { name: "Vehículos", href: "/dashboard/vehiculos", icon: Truck },
         ];
       case USER_ROLES.CLIENT:

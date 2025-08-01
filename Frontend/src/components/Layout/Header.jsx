@@ -1,9 +1,13 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
 import { LogOut, Bell, User } from "lucide-react";
+import { useNotificaciones } from "../../context/NotificacionesContext";
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const { mensajes = [] } = useNotificaciones() || {};
+
+  const noLeidos = mensajes.filter((m) => !m.leido).length;
 
   return (
     <header className="bg-white shadow-sm border-b border-stone-200 px-6 py-4">
@@ -20,9 +24,11 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <button className="relative p-2 text-stone-400 hover:text-stone-600 transition-colors">
             <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-              3
-            </span>
+            {noLeidos > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                {noLeidos}
+              </span>
+            )}
           </button>
 
           <div className="flex items-center space-x-3">
