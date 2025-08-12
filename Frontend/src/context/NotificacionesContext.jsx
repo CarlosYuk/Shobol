@@ -8,14 +8,14 @@ export const NotificacionesProvider = ({ children }) => {
   const [mensajes, setMensajes] = useState([]);
 
   useEffect(() => {
-    const fetchMensajes = async () => {
+   /*  const fetchMensajes = async () => {
       const res = await fetch("http://localhost:5000/api/mensajes");
       const data = await res.json();
       setMensajes(data);
     };
     fetchMensajes();
     const interval = setInterval(fetchMensajes, 10000);
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); */
   }, []);
 
   return (

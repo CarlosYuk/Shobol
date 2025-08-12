@@ -15,34 +15,55 @@ exports.listar = async (req, res) => {
 };
 
 // Crear solicitud
-exports.crear = async (req, res) => {
+exports.crearSolicitud = async (req, res) => {
   try {
-    console.log("Datos recibidos:", req.body); // <-- Agrega esto
-    const clienteId = req.user.id;
+    // Log para ver qué llega del frontend
+    console.log("BODY RECIBIDO EN CREAR SOLICITUD:", req.body);
+
     const {
+      cliente_id,
       nombreCliente,
       apellido,
       nombreEmpresa,
       lugar_entrega,
       numero_viajes,
       observaciones,
+      latitud,
+      longitud,
     } = req.body;
-    const solicitud = await Solicitud.create({
-      cliente_id: clienteId,
+
+    // Log para ver los valores que se van a guardar
+    console.log("Valores a guardar:", {
+      cliente_id,
       nombreCliente,
       apellido,
       nombreEmpresa,
       lugar_entrega,
       numero_viajes,
-      fecha_solicitud: new Date(),
-      estado: "pendiente",
       observaciones,
-      mensajeRespuesta: null, // Siempre null al crear
+      latitud,
+      longitud,
     });
-    res.status(201).json(solicitud);
+
+    const nuevaSolicitud = await Solicitud.create({
+      cliente_id,
+      nombreCliente,
+      apellido,
+      nombreEmpresa,
+      lugar_entrega,
+      numero_viajes,
+      observaciones,
+      latitud,
+      longitud,
+    });
+
+    // Log para ver el resultado guardado
+    console.log("Solicitud guardada:", nuevaSolicitud.toJSON());
+
+    res.status(201).json(nuevaSolicitud);
   } catch (error) {
-    console.error("Error detallado:", error); // Esto imprime el error real en la consola
-    res.status(500).json({ error: "Error al crear solicitud" });
+    console.error("Error al crear la solicitud:", error);
+    res.status(400).json({ error: "Error al crear la solicitud" });
   }
 };
 

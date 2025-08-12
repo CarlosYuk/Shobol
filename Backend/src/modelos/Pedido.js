@@ -46,6 +46,14 @@ const Pedido = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    latitud_entrega: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    longitud_entrega: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
   },
   {
     tableName: "pedidos",

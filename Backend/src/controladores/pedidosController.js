@@ -43,7 +43,20 @@ exports.obtenerPedidoPorId = async (req, res) => {
 // Crear un pedido
 exports.crearPedido = async (req, res) => {
   try {
-    const nuevoPedido = await Pedido.create(req.body);
+    const solicitud = await Solicitud.findByPk(req.body.solicitud_id);
+    if (!solicitud) {
+      return res.status(404).json({ error: "Solicitud no encontrada" });
+    }
+
+    const nuevoPedido = await Pedido.create({
+      ...req.body,
+      solicitud_id: solicitud.id,
+      cliente_id: solicitud.cliente_id,
+      direccion_entrega: solicitud.lugar_entrega,
+      latitud_entrega: solicitud.latitud,      // <-- CORRECTO
+      longitud_entrega: solicitud.longitud,    // <-- CORRECTO
+    });
+
     res.status(201).json(nuevoPedido);
   } catch (error) {
     res.status(400).json({ error: "Error al crear el pedido" });

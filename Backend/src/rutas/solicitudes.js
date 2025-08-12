@@ -25,6 +25,8 @@ router.post("/", async (req, res) => {
       lugar_entrega,
       numero_viajes,
       observaciones,
+      latitud,           // <-- agrega esto
+      longitud,          // <-- agrega esto
     } = req.body;
     const nuevaSolicitud = await Solicitud.create({
       cliente_id,
@@ -37,6 +39,8 @@ router.post("/", async (req, res) => {
       estado: "pendiente",
       observaciones,
       mensajeRespuesta: null,
+      latitud,           // <-- agrega esto
+      longitud,          // <-- agrega esto
     });
     res.status(201).json(nuevaSolicitud);
   } catch (error) {
@@ -55,13 +59,8 @@ router.put("/:id/aprobar", async (req, res) => {
     await solicitud.save();
 
     // Validar que todos los campos requeridos estén presentes
-    const {
-      material,
-      cantidad_toneladas,
-      fecha_entrega,
-      volumen,
-      tipo_carga,
-    } = req.body;
+    const { material, cantidad_toneladas, fecha_entrega, volumen, tipo_carga } =
+      req.body;
 
     if (
       !material ||
@@ -84,6 +83,8 @@ router.put("/:id/aprobar", async (req, res) => {
         fecha_entrega,
         volumen,
         tipo_carga,
+        latitud_entrega: solicitud.latitud,      // <-- COPIA LA UBICACIÓN
+        longitud_entrega: solicitud.longitud,    // <-- COPIA LA UBICACIÓN
       });
       pedidos.push(pedido);
     }
@@ -100,7 +101,11 @@ router.put("/:id/aprobar", async (req, res) => {
 // Aceptar o rechazar solicitud
 router.post("/:id/aceptar", solicitudControlador.aceptarSolicitud);
 router.post("/:id/rechazar", solicitudControlador.rechazarSolicitud);
-router.get("/cliente", verificarToken, solicitudControlador.obtenerSolicitudesCliente); // Para el panel del cliente
+router.get(
+  "/cliente",
+  verificarToken,
+  solicitudControlador.obtenerSolicitudesCliente
+); // Para el panel del cliente
 
 // Obtener solicitudes con filtro opcional por cliente
 router.get("/", async (req, res) => {

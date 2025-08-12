@@ -1,6 +1,6 @@
-// Nuevo archivo: c:\Shobol\Frontend\src\components\Cliente\SolicitudForm.jsx
 import React, { useState } from "react";
 import ApiService from "../../services/api";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
   const [nombreCliente, setNombreCliente] = useState("");
@@ -10,10 +10,32 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
   const [numeroViajes, setNumeroViajes] = useState(1);
   const [observaciones, setObservaciones] = useState("");
   const [loading, setLoading] = useState(false);
+  const [latitud, setLatitud] = useState(null);
+  const [longitud, setLongitud] = useState(null);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: "AIzaSyClTNi7CRWB1KBn-YJXDjUFjAOYq6evRDY", // Reemplaza con tu API KEY
+  });
+
+  const handleMapClick = (e) => {
+    setLatitud(e.latLng.lat());
+    setLongitud(e.latLng.lng());
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log({
+      cliente_id: clienteId,
+      nombreCliente,
+      apellido,
+      nombreEmpresa,
+      lugar_entrega: lugarEntrega,
+      numero_viajes: Number(numeroViajes),
+      observaciones,
+      latitud,
+      longitud,
+    });
     try {
       await ApiService.createSolicitud({
         cliente_id: clienteId,
@@ -23,6 +45,8 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
         lugar_entrega: lugarEntrega,
         numero_viajes: Number(numeroViajes),
         observaciones,
+        latitud,
+        longitud,
       });
       setNombreCliente("");
       setApellido("");
@@ -30,6 +54,8 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
       setLugarEntrega("");
       setNumeroViajes(1);
       setObservaciones("");
+      setLatitud(null);
+      setLongitud(null);
       if (onSolicitudCreada) onSolicitudCreada();
       alert("Solicitud registrada correctamente");
     } catch (error) {
@@ -95,9 +121,37 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
         className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-emerald-500 focus:border-emerald-500"
       />
       <br />
+      <div>
+        <label className="block mb-2 font-semibold">
+          Punto de entrega (haz clic en el mapa):
+        </label>
+        {isLoaded && (
+          <GoogleMap
+            mapContainerStyle={{ width: "100%", height: 300 }}
+            center={
+              latitud && longitud
+                ? { lat: latitud, lng: longitud }
+                : { lat: -1.67, lng: -78.65 }
+            }
+            zoom={7}
+            onClick={handleMapClick}
+          >
+            {latitud && longitud && (
+              <Marker
+                position={{ lat: latitud, lng: longitud }}
+              />
+            )}
+          </GoogleMap>
+        )}
+        {latitud && longitud && (
+          <div className="text-xs mt-2">
+            Latitud: {latitud}, Longitud: {longitud}
+          </div>
+        )}
+      </div>
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !latitud || !longitud}
         className="w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700 transition-all duration-300"
       >
         {loading ? "Enviando..." : "Enviar Solicitud"}

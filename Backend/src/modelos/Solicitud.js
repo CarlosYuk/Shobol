@@ -45,6 +45,16 @@ const Solicitud = db.define(
       allowNull: true,
       field: "mensajeRespuesta",
     },
+    latitud: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+      field: "latitud_entrega",
+    },
+    longitud: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+      field: "longitud_entrega",
+    },
   },
   {
     tableName: "solicitudes",

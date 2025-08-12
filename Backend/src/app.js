@@ -46,7 +46,7 @@ const PUERTO = process.env.PUERTO || 3000;
 
 // Sincroniza los modelos y arranca el servidor
 sequelize
-  .sync({ alter: true }) // Esto eliminará y recreará las tablas
+  .sync({ alter: false }) // Esto eliminará y recreará las tablas
   .then(() => {
     console.log("Base de datos sincronizada correctamente.");
     app.listen(5000, () => {

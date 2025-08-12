@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import MapaUbicacion from "./MapaUbicacion";
 
 const ChoferAsignaciones = () => {
   const { user } = useAuth();
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [origen, setOrigen] = useState(null);
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
 
   // Buscar los pedidos asignados a este chofer (usuario)
   useEffect(() => {
@@ -33,6 +36,36 @@ const ChoferAsignaciones = () => {
     );
   };
 
+  const handleVerRuta = (pedido) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const ubicacionActual = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          };
+          // Guardar la ubicación en la tabla ubicaciones
+          fetch("http://localhost:5000/api/ubicaciones", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pedido_id: pedido.id,
+              lat: ubicacionActual.lat,
+              lng: ubicacionActual.lng,
+            }),
+          });
+          setOrigen(ubicacionActual);
+          setPedidoSeleccionado(pedido);
+        },
+        () => {
+          alert("No se pudo obtener la ubicación actual.");
+        }
+      );
+    } else {
+      alert("Geolocalización no soportada.");
+    }
+  };
+
   if (loading) return <div>Cargando asignaciones...</div>;
 
   return (
@@ -57,7 +90,8 @@ const ChoferAsignaciones = () => {
                 <strong>Empresa:</strong> {pedido.solicitud?.nombreEmpresa}
               </div>
               <div>
-                <strong>Lugar de entrega:</strong> {pedido.solicitud?.lugar_entrega}
+                <strong>Lugar de entrega:</strong>{" "}
+                {pedido.solicitud?.lugar_entrega}
               </div>
               <div>
                 <strong>Estado:</strong> {pedido.estado}
@@ -96,6 +130,25 @@ const ChoferAsignaciones = () => {
                   Marcar como entregado
                 </button>
               )}
+              {/* Botón para ver ruta */}
+              <button
+                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+                onClick={() => handleVerRuta(pedido)}
+              >
+                Ver ruta
+              </button>
+              {/* Mapa de ubicación */}
+              {pedidoSeleccionado &&
+                pedidoSeleccionado.id === pedido.id &&
+                origen && (
+                  <MapaUbicacion
+                    origen={origen}
+                    destino={{
+                      lat: pedido.latitud_entrega,
+                      lng: pedido.longitud_entrega,
+                    }}
+                  />
+                )}
             </li>
           ))}
         </ul>

@@ -71,11 +71,6 @@ const Sidebar = () => {
             href: "/dashboard/mis-asignaciones",
             icon: ClipboardList,
           },
-          {
-            name: "Mi Ubicación",
-            href: "/dashboard/mi-ubicacion",
-            icon: MapPin,
-          },
         ];
       default:
         return baseItems;
