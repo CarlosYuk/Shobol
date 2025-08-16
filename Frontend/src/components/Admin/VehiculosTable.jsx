@@ -305,61 +305,93 @@ const VehiculosTable = () => {
       {cargando ? (
         <div className="text-center py-8">Cargando vehículos...</div>
       ) : (
-        <table className="min-w-full divide-y divide-gray-200 bg-white rounded shadow">
-          <thead>
-            <tr>
-              <th>Placa</th>
-              <th>Modelo</th>
-              <th>Año</th>
-              <th>Chofer</th>
-              <th>Propietario</th>
-              <th>Estado</th>
-              <th>Número Vehículo</th> {/* Nueva columna */}
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vehiculos.map((v) => (
-              <tr key={v.id}>
-                <td>{v.placa}</td>
-                <td>{v.modelo}</td>
-                <td>{v.anio}</td>
-                <td>{v.nombre_chofer}</td>
-                <td>{v.nombre_propietario}</td>
-                <td>
-                  <select
-                    value={v.estado}
-                    onChange={(e) =>
-                      cambiarEstadoVehiculo(v.id, e.target.value)
-                    }
-                    className="border rounded px-1 py-0.5"
-                  >
-                    {estados.map((e) => (
-                      <option key={e} value={e}>
-                        {e.charAt(0).toUpperCase() + e.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-                <td>{v.numero_vehiculo}</td> {/* Mostrar número de vehículo */}
-                <td>
-                  <button
-                    className="text-blue-600 mr-2"
-                    onClick={() => handleEditar(v)}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="text-red-600"
-                    onClick={() => handleEliminar(v.id)}
-                  >
-                    Eliminar
-                  </button>
-                </td>
+        <div className="overflow-x-auto rounded shadow bg-white">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-emerald-600">
+              <tr>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                  Placa
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                  Modelo
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                  Año
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                  Chofer
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                  Propietario
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                  Estado
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                  Número Vehículo
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                  Acciones
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {vehiculos.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="text-center py-4 text-gray-500">
+                    No hay vehículos registrados.
+                  </td>
+                </tr>
+              )}
+              {vehiculos.map((v, idx) => (
+                <tr
+                  key={v.id}
+                  className={
+                    idx % 2 === 0
+                      ? "bg-white hover:bg-gray-50"
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }
+                >
+                  <td className="px-4 py-2">{v.placa}</td>
+                  <td className="px-4 py-2">{v.modelo}</td>
+                  <td className="px-4 py-2">{v.anio}</td>
+                  <td className="px-4 py-2">{v.nombre_chofer}</td>
+                  <td className="px-4 py-2">{v.nombre_propietario}</td>
+                  <td className="px-4 py-2">
+                    <select
+                      value={v.estado}
+                      onChange={(e) =>
+                        cambiarEstadoVehiculo(v.id, e.target.value)
+                      }
+                      className="border rounded px-2 py-1"
+                    >
+                      {estados.map((e) => (
+                        <option key={e} value={e}>
+                          {e.charAt(0).toUpperCase() + e.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="px-4 py-2">{v.numero_vehiculo}</td>
+                  <td className="px-4 py-2">
+                    <button
+                      className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600"
+                      onClick={() => handleEditar(v)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                      onClick={() => handleEliminar(v.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

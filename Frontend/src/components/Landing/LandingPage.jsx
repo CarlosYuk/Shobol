@@ -14,12 +14,14 @@ import {
 } from "lucide-react";
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const LandingPage = () => {
-  const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [unidades, setUnidades] = useState([]);
   const [showInfoForm, setShowInfoForm] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     fetch("http://localhost:5000/api/vehiculos/unidades-disponibles")
@@ -102,7 +104,7 @@ const LandingPage = () => {
             </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => setShowLogin(true)}
+                onClick={() => navigate("/login")}
                 className="px-6 py-2 text-emerald-700 hover:text-emerald-800 font-medium transition-colors"
               >
                 Iniciar Sesión
@@ -446,7 +448,9 @@ const LandingPage = () => {
       </footer>
 
       {/* Modals */}
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+      {location.pathname === "/login" && (
+        <LoginModal onClose={() => navigate("/")} />
+      )}
       {showRegister && <RegisterModal onClose={() => setShowRegister(false)} />}
       {showInfoForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">

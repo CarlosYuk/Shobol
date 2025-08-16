@@ -1,37 +1,55 @@
-import React, { useState } from "react";
-import { useAuth } from "../../context/AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate, useLocation } from "react-router-dom";
 import { X, Eye, EyeOff, Loader2, Mountain } from "lucide-react";
 
 const LoginModal = ({ onClose }) => {
+  const { login, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Lee el error de la URL
+  const params = new URLSearchParams(location.search);
+  const errorFromUrl = params.get("error");
+
+  // Mantén los valores de los inputs aunque el modal se remonte
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { login, loading, error, setError } = useAuth();
-  const navigate = useNavigate();
 
+  // El error local se sincroniza con el error de la URL
+  const [localError, setLocalError] = useState(errorFromUrl || null);
+
+  useEffect(() => {
+    setLocalError(errorFromUrl);
+  }, [errorFromUrl]);
+
+  // Solo limpia el error cuando el usuario empieza a escribir después de mostrar el error
   const handleChangeCorreo = (e) => {
     setCorreo(e.target.value);
-    if (error) setError(null);
+    if (localError) setLocalError(null);
+    if (errorFromUrl) navigate("/login", { replace: true });
   };
 
   const handleChangeContrasena = (e) => {
     setContrasena(e.target.value);
-    if (error) setError(null);
+    if (localError) setLocalError(null);
+    if (errorFromUrl) navigate("/login", { replace: true });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!correo || !contrasena) {
-      setError("Por favor complete todos los campos");
+      setLocalError("Por favor complete todos los campos");
       return;
     }
-
-    const success = await login({ correo, contrasena });
-    if (success) {
+    const result = await login({ correo, contrasena });
+    if (result === true) {
       onClose();
       navigate("/dashboard");
+    } else if (typeof result === "string") {
+      // Navega a /login?error=mensaje para mantener el error en la URL
+      navigate(`/login?error=${encodeURIComponent(result)}`, { replace: true });
     }
   };
 
@@ -116,10 +134,8 @@ const LoginModal = ({ onClose }) => {
             </div>
 
             {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
+            {localError && (
+              <div className="text-red-600 text-sm mb-2">{localError}</div>
             )}
 
             {/* Submit Button */}
@@ -147,3 +163,4 @@ const LoginModal = ({ onClose }) => {
 };
 
 export default LoginModal;
+<LoginModal onClose={() => navigate("/")} />;

@@ -68,14 +68,25 @@ const ChoferAsignaciones = () => {
 
   if (loading) return <div>Cargando asignaciones...</div>;
 
+  // Separar pedidos asignados y entregados
+  const pedidosAsignados = pedidos.filter(
+    (p) => p.estado !== "entregado"
+  );
+  const pedidosEntregados = pedidos.filter(
+    (p) => p.estado === "entregado"
+  );
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Mis Asignaciones</h2>
-      {pedidos.length === 0 ? (
-        <p>No tienes asignaciones actualmente.</p>
+
+      {/* Pedidos Asignados */}
+      <h3 className="text-lg font-semibold mb-2 text-emerald-700">Asignados</h3>
+      {pedidosAsignados.length === 0 ? (
+        <p>No tienes asignaciones pendientes actualmente.</p>
       ) : (
-        <ul className="space-y-4">
-          {pedidos.map((pedido) => (
+        <ul className="space-y-4 mb-8">
+          {pedidosAsignados.map((pedido) => (
             <li key={pedido.id} className="p-4 bg-white rounded shadow">
               <div>
                 <strong>Pedido:</strong> {pedido.id}
@@ -116,28 +127,22 @@ const ChoferAsignaciones = () => {
               <div>
                 <strong>Placa:</strong> {pedido.vehiculo?.placa}
               </div>
-
               <div>
                 <strong>Propietario:</strong>{" "}
                 {pedido.vehiculo?.nombre_propietario}
               </div>
-              {/* Elimina o reemplaza el campo modelo */}
-              {pedido.estado !== "entregado" && (
-                <button
-                  className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded"
-                  onClick={() => marcarEntregado(pedido.id)}
-                >
-                  Marcar como entregado
-                </button>
-              )}
-              {/* Botón para ver ruta */}
               <button
-                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+                className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded"
+                onClick={() => marcarEntregado(pedido.id)}
+              >
+                Marcar como entregado
+              </button>
+              <button
+                className="mt-2 ml-2 px-4 py-2 bg-blue-600 text-white rounded"
                 onClick={() => handleVerRuta(pedido)}
               >
                 Ver ruta
               </button>
-              {/* Mapa de ubicación */}
               {pedidoSeleccionado &&
                 pedidoSeleccionado.id === pedido.id &&
                 origen && (
@@ -149,6 +154,63 @@ const ChoferAsignaciones = () => {
                     }}
                   />
                 )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Pedidos Entregados */}
+      <h3 className="text-lg font-semibold mb-2 text-gray-700">Entregados</h3>
+      {pedidosEntregados.length === 0 ? (
+        <p>No tienes pedidos entregados.</p>
+      ) : (
+        <ul className="space-y-4">
+          {pedidosEntregados.map((pedido) => (
+            <li key={pedido.id} className="p-4 bg-gray-100 rounded shadow">
+              <div>
+                <strong>Pedido:</strong> {pedido.id}
+              </div>
+              <div>
+                <strong>Cliente:</strong> {pedido.solicitud?.nombreCliente}
+              </div>
+              <div>
+                <strong>Apellido:</strong> {pedido.solicitud?.apellido}
+              </div>
+              <div>
+                <strong>Empresa:</strong> {pedido.solicitud?.nombreEmpresa}
+              </div>
+              <div>
+                <strong>Lugar de entrega:</strong>{" "}
+                {pedido.solicitud?.lugar_entrega}
+              </div>
+              <div>
+                <strong>Estado:</strong> {pedido.estado}
+              </div>
+              <div>
+                <strong>Material:</strong> {pedido.material}
+              </div>
+              <div>
+                <strong>Cantidad (ton):</strong> {pedido.cantidad_toneladas}
+              </div>
+              <div>
+                <strong>Dirección de entrega:</strong>{" "}
+                {pedido.direccion_entrega}
+              </div>
+              <div>
+                <strong>Fecha de entrega:</strong>{" "}
+                {new Date(pedido.fecha_entrega).toLocaleString()}
+              </div>
+              <div>
+                <strong>Vehículo:</strong> {pedido.vehiculo?.numero_vehiculo}
+              </div>
+              <div>
+                <strong>Placa:</strong> {pedido.vehiculo?.placa}
+              </div>
+              <div>
+                <strong>Propietario:</strong>{" "}
+                {pedido.vehiculo?.nombre_propietario}
+              </div>
+              {/* No mostrar botones para entregados */}
             </li>
           ))}
         </ul>

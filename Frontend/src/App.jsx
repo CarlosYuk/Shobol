@@ -26,6 +26,7 @@ import MapaUbicacion from "./components/Chofer/MapaUbicacion";
 import DashboardChofer from "./components/Dashboard/DashboardChofer"; // Asegúrate de importar el nuevo componente
 import SeguimientoPedido from "./components/Cliente/SeguimientoPedido";
 import SeguimientoPedidoWrapper from "./components/Cliente/SeguimientoPedidoWrapper";
+import DriverDashboard from "./components/Dashboard/DriverDashboard";
 
 // Define los roles válidos para el sistema
 
@@ -42,6 +43,7 @@ const AppRoutes = () => {
     return (
       <Routes>
         <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
+        <Route path="/login" element={<LandingPage />} />
         <Route path="*" element={<LandingPage />} />
       </Routes>
     );
@@ -67,7 +69,7 @@ const AppRoutes = () => {
             ) : user.rol === "gestor" ? (
               <GestorDashboard />
             ) : user.rol === "chofer" ? (
-              <ChoferAsignaciones />
+              <DriverDashboard /> // <-- Dashboard del chofer aquí
             ) : (
               <ClientDashboard />
             )
@@ -94,8 +96,8 @@ const AppRoutes = () => {
         {/* Ruta para chofer: Mis Asignaciones */}
         {user.rol === "chofer" && (
           <Route
-            path="/dashboard/mis-asignaciones"
-            element={<ChoferAsignaciones />}
+            path="mis-asignaciones"
+            element={<ChoferAsignaciones />} // <-- Asignaciones aquí
           />
         )}
         {user.rol === "cliente" && (

@@ -76,6 +76,7 @@ const AprobarPedidoModal = ({ solicitud, onClose, onAprobado }) => {
           onChange={handleChange}
           required
           type="date"
+          min={new Date().toISOString().split("T")[0]} // <-- Solo hoy o futuro
           className="mb-2 w-full border px-2 py-1 rounded"
         />
         <input

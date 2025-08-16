@@ -50,11 +50,7 @@ const MyRequests = () => {
                   </button>
                 ) : s.estado === "rechazada" ? (
                   s.mensajeRespuesta
-                ) : (
-                  <Link to={`/dashboard/seguimiento/${s.id}`}>
-                    Ver seguimiento
-                  </Link>
-                )}
+                ) : null}
               </td>
             </tr>
           ))}
@@ -155,12 +151,14 @@ const MyRequests = () => {
                         </p>
                       </>
                     )}
-                    <Link
-                      to={`/dashboard/seguimiento/${pedido.id}`}
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver seguimiento
-                    </Link>
+                    {pedido.estado !== "entregado" && (
+                      <Link
+                        to={`/dashboard/seguimiento/${pedido.id}`}
+                        className="text-blue-500 hover:underline"
+                      >
+                        Ver seguimiento
+                      </Link>
+                    )}
                   </div>
                 ))}
               </>

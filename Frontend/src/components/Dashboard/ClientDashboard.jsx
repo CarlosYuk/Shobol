@@ -9,89 +9,88 @@ import {
   Calendar,
 } from "lucide-react";
 import ApiService from "../../services/api";
-import SolicitudForm from "../Cliente/SolicitudForm";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom"; // <-- Importa useNavigate
+import { useNavigate, Link } from "react-router-dom";
 
 const ClientDashboard = () => {
   const { user } = useAuth();
   const [solicitudes, setSolicitudes] = useState([]);
-  const navigate = useNavigate(); // <-- Hook de navegación
+  const [pedidos, setPedidos] = useState([]);
+  const navigate = useNavigate();
 
+  // Cargar solicitudes y pedidos reales
   const cargarSolicitudes = async () => {
     try {
       const todas = await ApiService.getRequests();
-      // Filtra solo las del cliente actual
       setSolicitudes(todas.filter((s) => s.cliente_id === user.id));
     } catch (error) {
       setSolicitudes([]);
     }
   };
 
+  const cargarPedidos = async () => {
+    try {
+      const todos = await ApiService.getPedidos();
+      setPedidos(todos.filter((p) => p.cliente_id === user.id));
+    } catch (error) {
+      setPedidos([]);
+    }
+  };
+
   useEffect(() => {
     cargarSolicitudes();
+    cargarPedidos();
   }, []);
 
+  // Estadísticas reales
   const stats = [
-    { title: "Envíos Activos", value: 8, icon: Package, color: "emerald" },
-    { title: "En Tránsito", value: 5, icon: Clock, color: "amber" },
-    { title: "Entregados", value: 142, icon: CheckCircle, color: "lime" },
-    { title: "Pendientes", value: 3, icon: AlertCircle, color: "red" },
-  ];
-
-  const recentShipments = [
     {
-      id: "ENV-2024-001",
-      cargo: "Piedra Caliza Triturada",
-      route: "Lima - Arequipa",
-      status: "in-transit",
-      progress: 65,
-      estimatedArrival: "2024-01-20 14:30",
+      title: "Envíos Activos",
+      value: pedidos.filter((p) => p.estado === "asignado" || p.estado === "en_transito").length,
+      icon: Package,
+      color: "emerald",
     },
     {
-      id: "ENV-2024-002",
-      cargo: "Caliza Industrial",
-      route: "Cusco - Puerto Maldonado",
-      status: "pending",
-      progress: 0,
-      estimatedArrival: "2024-01-22 09:00",
+      title: "En Tránsito",
+      value: pedidos.filter((p) => p.estado === "en_transito").length,
+      icon: Clock,
+      color: "amber",
     },
     {
-      id: "ENV-2024-003",
-      cargo: "Piedra Caliza Pulverizada",
-      route: "Trujillo - Chiclayo",
-      status: "delivered",
-      progress: 100,
-      estimatedArrival: "2024-01-18 16:45",
+      title: "Entregados",
+      value: pedidos.filter((p) => p.estado === "entregado").length,
+      icon: CheckCircle,
+      color: "lime",
+    },
+    {
+      title: "Pendientes",
+      value: solicitudes.filter((s) => s.estado === "pendiente").length,
+      icon: AlertCircle,
+      color: "red",
     },
   ];
 
-  const upcomingServices = [
-    {
-      date: "2024-01-22",
-      service: "Transporte de Caliza",
-      route: "Lima - Arequipa",
-    },
-    {
-      date: "2024-01-25",
-      service: "Transporte Industrial",
-      route: "Cusco - Lima",
-    },
-    {
-      date: "2024-01-28",
-      service: "Transporte Especial",
-      route: "Iquitos - Lima",
-    },
-  ];
+  // Envíos recientes (últimos 3 pedidos)
+  const recentShipments = pedidos
+    .sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))
+    .slice(0, 3);
+
+  // Servicios próximos (puedes adaptar según tu modelo)
+  const upcomingServices = solicitudes
+    .filter((s) => s.estado === "aprobada")
+    .sort((a, b) => new Date(a.fecha_entrega) - new Date(b.fecha_entrega))
+    .slice(0, 3);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "delivered":
+      case "entregado":
         return "bg-emerald-100 text-emerald-800";
-      case "in-transit":
+      case "en_transito":
         return "bg-blue-100 text-blue-800";
-      case "pending":
+      case "asignado":
         return "bg-amber-100 text-amber-800";
+      case "pendiente":
+        return "bg-stone-100 text-stone-800";
       default:
         return "bg-stone-100 text-stone-800";
     }
@@ -99,11 +98,13 @@ const ClientDashboard = () => {
 
   const getStatusText = (status) => {
     switch (status) {
-      case "delivered":
+      case "entregado":
         return "Entregado";
-      case "in-transit":
+      case "en_transito":
         return "En Tránsito";
-      case "pending":
+      case "asignado":
+        return "Asignado";
+      case "pendiente":
         return "Pendiente";
       default:
         return status;
@@ -136,6 +137,9 @@ const ClientDashboard = () => {
             <Package className="h-5 w-5 text-stone-400" />
           </div>
           <div className="space-y-4">
+            {recentShipments.length === 0 && (
+              <div className="text-stone-500">No hay envíos recientes.</div>
+            )}
             {recentShipments.map((shipment) => (
               <div
                 key={shipment.id}
@@ -143,39 +147,38 @@ const ClientDashboard = () => {
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-stone-900">
-                    {shipment.id}
+                    {shipment.numero_envio || shipment.id}
                   </span>
                   <span
                     className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                      shipment.status
+                      shipment.estado
                     )}`}
                   >
-                    {getStatusText(shipment.status)}
+                    {getStatusText(shipment.estado)}
                   </span>
                 </div>
                 <div className="mb-2">
                   <p className="text-sm font-medium text-stone-700">
-                    {shipment.cargo}
+                    {shipment.descripcion || "Sin descripción"}
                   </p>
-                  <p className="text-sm text-stone-500">{shipment.route}</p>
+                  <p className="text-sm text-stone-500">
+                    {shipment.direccion_entrega}
+                  </p>
                 </div>
-                {shipment.status === "in-transit" && (
-                  <div className="mb-2">
-                    <div className="flex items-center justify-between text-xs text-stone-600 mb-1">
-                      <span>Progreso</span>
-                      <span>{shipment.progress}%</span>
-                    </div>
-                    <div className="w-full bg-stone-200 rounded-full h-2">
-                      <div
-                        className="bg-emerald-600 h-2 rounded-full transition-all"
-                        style={{ width: `${shipment.progress}%` }}
-                      />
-                    </div>
-                  </div>
+                {/* Solo mostrar seguimiento si NO está entregado */}
+                {shipment.estado !== "entregado" && (
+                  <Link
+                    to={`/dashboard/seguimiento/${shipment.id}`}
+                    className="text-blue-500 hover:underline text-sm"
+                  >
+                    Ver seguimiento
+                  </Link>
                 )}
-                <div className="flex items-center text-xs text-stone-500">
+                <div className="flex items-center text-xs text-stone-500 mt-2">
                   <Clock className="h-3 w-3 mr-1" />
-                  Llegada estimada: {shipment.estimatedArrival}
+                  {shipment.fecha_entrega
+                    ? `Entrega estimada: ${shipment.fecha_entrega}`
+                    : `Creado: ${shipment.fecha_creacion}`}
                 </div>
               </div>
             ))}
@@ -191,33 +194,30 @@ const ClientDashboard = () => {
             <Calendar className="h-5 w-5 text-stone-400" />
           </div>
           <div className="space-y-4">
+            {upcomingServices.length === 0 && (
+              <div className="text-stone-500">No hay servicios próximos.</div>
+            )}
             {upcomingServices.map((service, index) => (
               <div
-                key={index}
+                key={service.id || index}
                 className="border border-stone-200 rounded-lg p-4"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-stone-900">
-                    {service.service}
+                    {service.nombreEmpresa || "Servicio"}
                   </span>
                   <span className="text-sm text-emerald-600 font-medium">
-                    {service.date}
+                    {service.fecha_entrega || "Próximamente"}
                   </span>
                 </div>
                 <div className="flex items-center text-sm text-stone-600">
                   <MapPin className="h-4 w-4 mr-1" />
-                  {service.route}
+                  {service.lugar_entrega}
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-4">
-            {/* Aquí agregas el formulario */}
-            <SolicitudForm
-              clienteId={user.id}
-              onSolicitudCreada={cargarSolicitudes}
-            />
-          </div>
+          {/* Eliminado el formulario de solicitud aquí */}
         </div>
       </div>
 

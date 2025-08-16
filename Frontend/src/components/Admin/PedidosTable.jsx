@@ -232,7 +232,9 @@ const PedidosTable = () => {
                     <button
                       className="bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => openAsignarVehiculoModal(p.id)}
-                      disabled={p.estado === "entregado" || p.estado === "cancelado"}
+                      disabled={
+                        p.estado === "entregado" || p.estado === "cancelado"
+                      }
                     >
                       Asignar Vehículo
                     </button>

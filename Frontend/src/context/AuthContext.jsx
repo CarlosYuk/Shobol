@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import ApiService from "../services/api";
 
 const AuthContext = createContext();
@@ -9,13 +9,11 @@ export const AuthProvider = ({ children }) => {
   );
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const isAuthenticated = !!user && !!token;
 
   const login = async ({ correo, contrasena }) => {
     setLoading(true);
-    setError(null);
     try {
       const res = await ApiService.login({ correo, contrasena });
       if (res.token && res.usuario) {
@@ -25,11 +23,9 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("token", res.token);
         return true;
       }
-      setError("Credenciales inválidas");
-      return false;
+      return "Correo o contraseña incorrecta";
     } catch (err) {
-      setError("Credenciales inválidas");
-      return false;
+      return "Correo o contraseña incorrecta";
     } finally {
       setLoading(false);
     }
@@ -37,12 +33,10 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     setLoading(true);
-    setError(null);
     try {
       await ApiService.register(userData);
       return true;
     } catch (err) {
-      setError("No se pudo registrar");
       return false;
     } finally {
       setLoading(false);
@@ -56,10 +50,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
-  useEffect(() => {
-    // Si el token expira, puedes agregar lógica aquí
-  }, []);
-
   return (
     <AuthContext.Provider
       value={{
@@ -70,8 +60,6 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         loading,
-        error,
-        setError, // <-- agrega esto
       }}
     >
       {children}
