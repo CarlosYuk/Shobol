@@ -4,7 +4,21 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import AprobarPedidoModal from "./AprobarPedidoModal"; // Ajusta la ruta
+import AprobarPedidoModal from "./AprobarPedidoModal";
+
+const estadoColor = {
+  asignado: "bg-blue-100 text-blue-800",
+  en_transito: "bg-amber-100 text-amber-800",
+  entregado: "bg-gray-100 text-gray-800",
+  pendiente: "bg-red-100 text-red-800",
+};
+
+const estadoTexto = {
+  asignado: "Asignado",
+  en_transito: "En Tránsito",
+  entregado: "Entregado",
+  pendiente: "Pendiente",
+};
 
 const PedidosTable = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -43,29 +57,25 @@ const PedidosTable = () => {
     }
   };
 
-  // Abrir modal y cargar vehículos
   const openAsignarVehiculoModal = (pedidoId) => {
     setPedidoSeleccionado(pedidoId);
-    cargarVehiculos(); // <--- carga los vehículos aquí
+    cargarVehiculos();
     setShowVehiculoModal(true);
   };
 
-  // Asignar vehículo
   const handleAsignarVehiculo = async () => {
     try {
       await ApiService.asignarVehiculoPedido(pedidoSeleccionado, vehiculoId);
       setShowVehiculoModal(false);
       setVehiculoId("");
       setPedidoSeleccionado(null);
-      cargarPedidos(); // refresca la tabla
+      cargarPedidos();
       toast.success("Vehículo asignado correctamente");
     } catch (error) {
-      // Mostrar mensaje de advertencia del backend
       toast.error(error.message || "No se pudo asignar el vehículo");
     }
   };
 
-  // Cambiar estado
   const cambiarEstadoPedido = async (pedidoId, nuevoEstado) => {
     await ApiService.cambiarEstadoPedido(pedidoId, nuevoEstado);
     cargarPedidos();
@@ -123,165 +133,140 @@ const PedidosTable = () => {
     }
   };
 
+  // División: pedidos asignados y entregados
+  const pedidosAsignados = pedidosBuscados.filter(
+    (p) => p.estado !== "entregado"
+  );
+  const pedidosEntregados = pedidosBuscados.filter(
+    (p) => p.estado === "entregado"
+  );
+
+  if (loading) return <div className="p-8">Cargando pedidos...</div>;
+
   return (
     <div className="p-8">
-      <h2 className="text-2xl font-bold mb-6">Pedidos</h2>
-      <div className="mb-4">
-        <label className="mr-2 font-semibold">Filtrar por estado:</label>
-        <select
-          className="border rounded px-2 py-1"
-          value={filtroEstado}
-          onChange={(e) => setFiltroEstado(e.target.value)}
-        >
-          <option value="">Todos</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="asignado">Asignado</option>
-          <option value="entregado">Entregado</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
-      </div>
-      <div className="mb-4">
-        <label className="mr-2 font-semibold">Buscar:</label>
-        <input
-          type="text"
-          className="border rounded px-2 py-1"
-          placeholder="Dirección o Solicitud"
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
-      </div>
-      <button
-        className="mb-4 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded"
-        onClick={exportarExcel}
-      >
-        Exportar a Excel
-      </button>
-      <div className="overflow-x-auto rounded shadow bg-white">
-        {loading ? (
-          <div className="text-center py-8 text-emerald-600 font-semibold">
-            Cargando pedidos...
-          </div>
-        ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-emerald-600">
+      {/* Tabla de pedidos asignados */}
+      <div>
+        <h2 className="text-lg font-bold mb-4 text-blue-700 text-center">
+          Pedidos Asignados
+        </h2>
+        <div className="overflow-x-auto mb-10">
+          <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+            <thead className="bg-blue-600 text-white rounded-t-xl">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                  ID
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                  Solicitud
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                  Cantidad (ton)
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                  Dirección
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                  Fecha Entrega
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                  Estado
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                  Acciones
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                  Vehículo
-                </th>
-                {/* Puedes agregar más columnas según tu modelo */}
+                <th className="px-4 py-3 text-left rounded-tl-xl">ID</th>
+                <th className="px-4 py-3 text-left">Cliente</th>
+                <th className="px-4 py-3 text-left">Fecha</th>
+                <th className="px-4 py-3 text-left">Estado</th>
+                <th className="px-4 py-3 text-left">Material</th>
+                <th className="px-4 py-3 text-left">Acción</th>
+                <th className="px-4 py-3 text-left rounded-tr-xl">Vehículo</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {pedidosBuscados.length === 0 && (
+            <tbody>
+              {pedidosAsignados.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="text-center py-4 text-gray-500">
-                    No hay pedidos registrados.
+                  <td colSpan={7} className="text-center py-6 text-gray-500">
+                    No tienes pedidos asignados.
                   </td>
                 </tr>
               )}
-              {(pedidosBuscados || []).map((p) => (
-                <tr key={p.id}>
-                  <td className="px-4 py-2">{p.id}</td>
-                  <td className="px-4 py-2">{p.solicitud_id}</td>
-                  <td className="px-4 py-2">{p.cantidad_toneladas}</td>
-                  <td className="px-4 py-2">{p.direccion_entrega}</td>
-                  <td className="px-4 py-2">
+              {pedidosAsignados.map((p, idx) => (
+                <tr
+                  key={p.id}
+                  className={
+                    idx % 2 === 0
+                      ? "bg-white hover:bg-gray-50"
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }
+                >
+                  <td className="border px-4 py-3">{p.id}</td>
+                  <td className="border px-4 py-3">{p.cliente_id}</td>
+                  <td className="border px-4 py-3">
                     {p.fecha_entrega
-                      ? new Date(p.fecha_entrega).toLocaleDateString()
+                      ? new Date(p.fecha_entrega).toLocaleString()
                       : ""}
                   </td>
-                  <td className="px-4 py-2 capitalize">
-                    <select
-                      value={p.estado}
-                      onChange={(e) =>
-                        cambiarEstadoPedido(p.id, e.target.value)
-                      }
-                      className="border rounded px-2 py-1"
-                      disabled={
-                        p.estado === "entregado" || p.estado === "cancelado"
-                      }
+                  <td className="border px-4 py-3">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${estadoColor[p.estado]}`}
                     >
-                      <option value="pendiente">Pendiente</option>
-                      <option value="asignado">Asignado</option>
-                      <option value="entregado">Entregado</option>
-                      <option value="cancelado">Cancelado</option>
-                    </select>
+                      {estadoTexto[p.estado] || p.estado}
+                    </span>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="border px-4 py-3">{p.material}</td>
+                  <td className="border px-4 py-3">
                     <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => openAsignarVehiculoModal(p.id)}
-                      disabled={
-                        p.estado === "entregado" || p.estado === "cancelado"
-                      }
-                    >
-                      Asignar Vehículo
-                    </button>
-                    {!(
-                      p.estado === "entregado" || p.estado === "cancelado"
-                    ) && (
-                      <button
-                        className="bg-yellow-500 text-white px-2 py-1 rounded ml-2"
-                        onClick={() => cambiarEstadoPedido(p.id, "entregado")}
-                      >
-                        Marcar como Entregado
-                      </button>
-                    )}
-                    <button
-                      className="bg-gray-500 text-white px-2 py-1 rounded ml-2"
+                      className="text-blue-600 hover:underline font-medium"
                       onClick={() => openDetallesModal(p)}
                     >
-                      Ver Detalles
+                      Ver detalles
                     </button>
-                    <button
-                      className="bg-red-600 text-white px-2 py-1 rounded ml-2"
-                      onClick={() => eliminarPedido(p.id)}
-                      disabled={
-                        p.estado === "entregado" || p.estado === "cancelado"
-                      }
-                    >
-                      Eliminar
-                    </button>
-                    {/* <button
-                      className="bg-green-500 text-white px-2 py-1 rounded ml-2"
-                      onClick={() => setModalSolicitud(p)}
-                    >
-                      Aprobar y crear pedido
-                    </button> */}
                   </td>
-                  <td className="px-4 py-2">
-                    {p.vehiculo
-                      ? `${p.vehiculo.numero_vehiculo} (${p.vehiculo.placa})`
-                      : "Sin asignar"}
+                  <td className="border px-4 py-3">{p.vehiculo_id || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {/* Tabla de pedidos entregados */}
+      <div>
+        <h2 className="text-lg font-bold mb-4 text-gray-700 text-center">
+          Pedidos Entregados
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+            <thead className="bg-gray-700 text-white rounded-t-xl">
+              <tr>
+                <th className="px-4 py-3 text-left rounded-tl-xl">Fecha</th>
+                <th className="px-4 py-3 text-left">Estado</th>
+                <th className="px-4 py-3 text-left">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pedidosEntregados.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="text-center py-6 text-gray-500">
+                    No tienes pedidos entregados.
+                  </td>
+                </tr>
+              )}
+              {pedidosEntregados.map((p, idx) => (
+                <tr
+                  key={p.id}
+                  className={
+                    idx % 2 === 0
+                      ? "bg-white hover:bg-gray-50"
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }
+                >
+                  <td className="border px-4 py-3">
+                    {p.fecha_entrega
+                      ? new Date(p.fecha_entrega).toLocaleString()
+                      : ""}
+                  </td>
+                  <td className="border px-4 py-3">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${estadoColor[p.estado]}`}
+                    >
+                      {estadoTexto[p.estado] || p.estado}
+                    </span>
+                  </td>
+                  <td className="border px-4 py-3">
+                    <button
+                      className="text-gray-600 hover:underline font-medium"
+                      onClick={() => openDetallesModal(p)}
+                    >
+                      Ver detalles
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        )}
+        </div>
       </div>
-
       {showVehiculoModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg min-w-[300px]">
@@ -293,7 +278,7 @@ const PedidosTable = () => {
             >
               <option value="">Selecciona un vehículo</option>
               {vehiculos
-                .filter((v) => v.estado === "disponible") // <-- solo disponibles
+                .filter((v) => v.estado === "disponible")
                 .map((v) => (
                   <option key={v.id} value={v.id}>
                     {v.placa} - {v.modelo}

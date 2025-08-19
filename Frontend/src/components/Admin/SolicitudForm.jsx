@@ -88,6 +88,19 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
         <tr key={s.id}>
           {/* ...otras columnas... */}
           <td>
+            {s.estado === "aprobada" ? (
+              <span className="text-green-600 font-semibold">
+                {s.mensajeRespuesta || "Solicitud aprobada"}
+              </span>
+            ) : s.estado === "rechazada" ? (
+              <span className="text-red-600 font-semibold">
+                {s.mensajeRespuesta || "Solicitud rechazada"}
+              </span>
+            ) : (
+              <span className="text-amber-600 font-semibold">Pendiente</span>
+            )}
+          </td>
+          <td>
             <button onClick={() => setModalSolicitud(s)}>
               Aprobar y crear pedido
             </button>

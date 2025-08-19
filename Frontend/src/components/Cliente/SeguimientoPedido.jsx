@@ -11,7 +11,7 @@ const SeguimientoPedido = ({ pedidoId }) => {
   const [posicion, setPosicion] = useState(null);
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "", // Reemplaza con tu API Key
+    googleMapsApiKey: "AIzaSyClTNi7CRWB1KBn-YJXDjUFjAOYq6evRDY", // Reemplaza con tu API Key
   });
 
   // Polling para obtener la ubicación cada 5 segundos

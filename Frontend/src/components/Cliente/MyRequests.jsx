@@ -2,6 +2,22 @@ import React, { useEffect, useState } from "react";
 import { getSolicitudesCliente } from "../../services/api";
 import { Link } from "react-router-dom";
 
+const estadoColor = {
+  aprobada: "bg-emerald-100 text-emerald-800",
+  rechazada: "bg-red-100 text-red-800",
+  pendiente: "bg-yellow-100 text-yellow-800",
+  asignado: "bg-blue-100 text-blue-800",
+  entregado: "bg-gray-100 text-gray-800",
+};
+
+const estadoTexto = {
+  aprobada: "Aceptada",
+  rechazada: "Rechazada",
+  pendiente: "Pendiente",
+  asignado: "Asignado",
+  entregado: "Entregado",
+};
+
 const MyRequests = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [detalle, setDetalle] = useState(null);
@@ -10,165 +26,266 @@ const MyRequests = () => {
     getSolicitudesCliente().then(setSolicitudes);
   }, []);
 
+  // Agrupa pedidos asignados y entregados
+  const pedidosAsignados = [];
+  const pedidosEntregados = [];
+
+  solicitudes.forEach((s) => {
+    if (s.pedidos && s.pedidos.length > 0) {
+      s.pedidos.forEach((pedido) => {
+        if (pedido.estado === "entregado") {
+          pedidosEntregados.push({ solicitud: s, pedido });
+        } else {
+          pedidosAsignados.push({ solicitud: s, pedido });
+        }
+      });
+    }
+  });
+
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Mis Solicitudes</h2>
-      <table className="min-w-full bg-white rounded shadow">
-        <thead>
-          <tr>
-            <th className="px-4 py-2">Fecha</th>
-            <th className="px-4 py-2">Estado</th>
-            <th className="px-4 py-2">Mensaje / Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {solicitudes.map((s) => (
-            <tr key={s.id}>
-              <td className="border px-4 py-2">
-                {new Date(s.fecha_solicitud).toLocaleString()}
-              </td>
-              <td className="border px-4 py-2">
-                {s.estado === "aprobada" && (
-                  <span className="text-green-600 font-semibold">Aceptada</span>
+    <div className="max-w-5xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-6 text-emerald-700 text-center">
+        Mis Solicitudes
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Pedidos Asignados */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4 text-blue-700">
+            Pedidos Asignados
+          </h3>
+          <div className="overflow-x-auto rounded-lg shadow">
+            <table className="min-w-full bg-white">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th className="px-4 py-3 text-left">Fecha</th>
+                  <th className="px-4 py-3 text-left">Estado</th>
+                  <th className="px-4 py-3 text-left">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pedidosAsignados.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="text-center py-6 text-gray-500">
+                      No tienes pedidos asignados.
+                    </td>
+                  </tr>
                 )}
-                {s.estado === "rechazada" && (
-                  <span className="text-red-600 font-semibold">Rechazada</span>
-                )}
-                {s.estado === "pendiente" && (
-                  <span className="text-yellow-600 font-semibold">
-                    Pendiente
-                  </span>
-                )}
-              </td>
-              <td className="border px-4 py-2">
-                {s.estado === "aprobada" ? (
-                  <button
-                    onClick={() => setDetalle(s)}
-                    className="text-blue-500 hover:underline"
+                {pedidosAsignados.map(({ solicitud, pedido }, idx) => (
+                  <tr
+                    key={pedido.id}
+                    className={
+                      idx % 2 === 0
+                        ? "bg-white hover:bg-gray-50"
+                        : "bg-gray-50 hover:bg-gray-100"
+                    }
                   >
-                    Ver detalles del pedido
-                  </button>
-                ) : s.estado === "rechazada" ? (
-                  s.mensajeRespuesta
-                ) : null}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                    <td className="border px-4 py-3">
+                      {new Date(solicitud.fecha_solicitud).toLocaleString()}
+                    </td>
+                    <td className="border px-4 py-3">
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${estadoColor[pedido.estado]}`}
+                      >
+                        {estadoTexto[pedido.estado] || pedido.estado}
+                      </span>
+                    </td>
+                    <td className="border px-4 py-3">
+                      <button
+                        onClick={() => setDetalle({ ...solicitud, pedido })}
+                        className="text-blue-600 hover:underline font-medium"
+                      >
+                        Ver detalles
+                      </button>
+                      <Link
+                        to={`/dashboard/seguimiento/${pedido.id}`}
+                        className="ml-4 text-blue-600 hover:underline font-medium"
+                      >
+                        Ver seguimiento
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* Pedidos Entregados */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+            Pedidos Entregados
+          </h3>
+          <div className="overflow-x-auto rounded-lg shadow">
+            <table className="min-w-full bg-white">
+              <thead className="bg-gray-600 text-white">
+                <tr>
+                  <th className="px-4 py-3 text-left">Fecha</th>
+                  <th className="px-4 py-3 text-left">Estado</th>
+                  <th className="px-4 py-3 text-left">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pedidosEntregados.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="text-center py-6 text-gray-500">
+                      No tienes pedidos entregados.
+                    </td>
+                  </tr>
+                )}
+                {pedidosEntregados.map(({ solicitud, pedido }, idx) => (
+                  <tr
+                    key={pedido.id}
+                    className={
+                      idx % 2 === 0
+                        ? "bg-white hover:bg-gray-50"
+                        : "bg-gray-50 hover:bg-gray-100"
+                    }
+                  >
+                    <td className="border px-4 py-3">
+                      {new Date(solicitud.fecha_solicitud).toLocaleString()}
+                    </td>
+                    <td className="border px-4 py-3">
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${estadoColor[pedido.estado]}`}
+                      >
+                        {estadoTexto[pedido.estado] || pedido.estado}
+                      </span>
+                    </td>
+                    <td className="border px-4 py-3">
+                      <button
+                        onClick={() => setDetalle({ ...solicitud, pedido })}
+                        className="text-gray-600 hover:underline font-medium"
+                      >
+                        Ver detalles
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       {/* Modal de detalles */}
       {detalle && (
         <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0,0,0,0.3)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
           onClick={() => setDetalle(null)}
         >
           <div
-            style={{
-              background: "#fff",
-              padding: 24,
-              borderRadius: 8,
-              minWidth: 300,
-            }}
+            className="bg-white p-8 rounded-lg shadow-lg min-w-[350px] max-w-lg w-full relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold mb-2">
-              Detalles de la Solicitud
-            </h3>
-            <p>
-              <b>Fecha Solicitud:</b> {detalle.fecha_solicitud || detalle.fecha}
-            </p>
-            <p>
-              <b>Observaciones:</b> {detalle.observaciones}
-            </p>
-            <p>
-              <b>Estado Solicitud:</b> {detalle.estado}
-            </p>
-            {/* Mostrar detalles del pedido si existen */}
-            {detalle.pedidos && detalle.pedidos.length > 0 && (
-              <>
-                <hr className="my-2" />
-                <h4 className="font-semibold mb-1">Datos del Pedido</h4>
-                {detalle.pedidos.map((pedido) => (
-                  <div key={pedido.id}>
-                    <p>
-                      <b>ID Pedido:</b> {pedido.id}
-                    </p>
-                    <p>
-                      <b>Cantidad (ton):</b> {pedido.cantidad_toneladas}
-                    </p>
-                    <p>
-                      <b>Dirección de Entrega:</b> {pedido.direccion_entrega}
-                    </p>
-                    <p>
-                      <b>Fecha de Entrega:</b> {pedido.fecha_entrega}
-                    </p>
-                    <p>
-                      <b>Estado Pedido:</b> {pedido.estado}
-                    </p>
-                    <p>
-                      <b>Mensaje:</b> {pedido.mensaje || "-"}
-                    </p>
-                    {/* Mostrar detalles del vehículo si existen */}
-                    {pedido.vehiculo && (
-                      <>
-                        <hr className="my-2" />
-                        <h4 className="font-semibold mb-1">
-                          Vehículo Asignado
-                        </h4>
-                        <p>
-                          <b>Número Vehículo:</b>{" "}
-                          {pedido.vehiculo.numero_vehiculo}
-                        </p>
-                        <p>
-                          <b>Placa:</b> {pedido.vehiculo.placa}
-                        </p>
-                        <p>
-                          <b>Modelo:</b> {pedido.vehiculo.modelo}
-                        </p>
-                        <p>
-                          <b>Año:</b> {pedido.vehiculo.anio}
-                        </p>
-                        <p>
-                          <b>Chofer:</b> {pedido.vehiculo.nombre_chofer}
-                        </p>
-                        <p>
-                          <b>Propietario:</b>{" "}
-                          {pedido.vehiculo.nombre_propietario}
-                        </p>
-                        <p>
-                          <b>Estado Vehículo:</b> {pedido.vehiculo.estado}
-                        </p>
-                      </>
-                    )}
-                    {pedido.estado !== "entregado" && (
-                      <Link
-                        to={`/dashboard/seguimiento/${pedido.id}`}
-                        className="text-blue-500 hover:underline"
-                      >
-                        Ver seguimiento
-                      </Link>
-                    )}
-                  </div>
-                ))}
-              </>
-            )}
             <button
               onClick={() => setDetalle(null)}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold"
+              title="Cerrar"
             >
-              Cerrar
+              &times;
             </button>
+            <h3 className="text-lg font-semibold mb-4 text-emerald-700">
+              Detalles del Pedido
+            </h3>
+            <div className="space-y-2">
+              <div>
+                <b>Fecha Solicitud:</b>{" "}
+                {detalle.fecha_solicitud
+                  ? new Date(detalle.fecha_solicitud).toLocaleString()
+                  : detalle.fecha}
+              </div>
+              <div>
+                <b>Observaciones:</b> {detalle.observaciones}
+              </div>
+              <div>
+                <b>Estado Solicitud:</b>{" "}
+                <span
+                  className={`inline-block px-2 py-1 rounded-full font-semibold text-sm ${estadoColor[detalle.estado]}`}
+                >
+                  {estadoTexto[detalle.estado] || detalle.estado}
+                </span>
+              </div>
+            </div>
+            {/* Mostrar detalles del pedido */}
+            {detalle.pedido && (
+              <>
+                <hr className="my-4" />
+                <h4 className="font-semibold mb-2 text-emerald-600">
+                  Datos del Pedido
+                </h4>
+                <div className="space-y-4">
+                  <div className="border rounded-lg p-4 bg-gray-50 mb-2">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                      <div>
+                        <b>ID Pedido:</b> {detalle.pedido.id}
+                      </div>
+                      <div>
+                        <b>Cantidad (ton):</b> {detalle.pedido.cantidad_toneladas}
+                      </div>
+                      <div>
+                        <b>Dirección de Entrega:</b> {detalle.pedido.direccion_entrega}
+                      </div>
+                      <div>
+                        <b>Fecha de Entrega:</b> {detalle.pedido.fecha_entrega}
+                      </div>
+                      <div>
+                        <b>Estado Pedido:</b>{" "}
+                        <span
+                          className={`inline-block px-2 py-1 rounded-full font-semibold text-xs ${estadoColor[detalle.pedido.estado]}`}
+                        >
+                          {estadoTexto[detalle.pedido.estado] || detalle.pedido.estado}
+                        </span>
+                      </div>
+                      <div>
+                        <b>Mensaje:</b> {detalle.pedido.mensaje || "-"}
+                      </div>
+                    </div>
+                    {/* Mostrar detalles del vehículo si existen */}
+                    {detalle.pedido.vehiculo && (
+                      <div className="mt-3 border-t pt-3">
+                        <h4 className="font-semibold mb-1 text-emerald-700">
+                          Vehículo Asignado
+                        </h4>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                          <div>
+                            <b>Número Vehículo:</b>{" "}
+                            {detalle.pedido.vehiculo.numero_vehiculo}
+                          </div>
+                          <div>
+                            <b>Placa:</b> {detalle.pedido.vehiculo.placa}
+                          </div>
+                          <div>
+                            <b>Modelo:</b> {detalle.pedido.vehiculo.modelo}
+                          </div>
+                          <div>
+                            <b>Año:</b> {detalle.pedido.vehiculo.anio}
+                          </div>
+                          <div>
+                            <b>Chofer:</b> {detalle.pedido.vehiculo.nombre_chofer}
+                          </div>
+                          <div>
+                            <b>Propietario:</b>{" "}
+                            {detalle.pedido.vehiculo.nombre_propietario}
+                          </div>
+                          <div>
+                            <b>Estado Vehículo:</b> {detalle.pedido.vehiculo.estado}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {detalle.pedido.estado !== "entregado" && (
+                      <div className="mt-3">
+                        <Link
+                          to={`/dashboard/seguimiento/${detalle.pedido.id}`}
+                          className="text-blue-600 hover:underline font-medium"
+                        >
+                          Ver seguimiento
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

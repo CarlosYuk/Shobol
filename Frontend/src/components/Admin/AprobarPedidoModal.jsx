@@ -29,7 +29,8 @@ const AprobarPedidoModal = ({ solicitud, onClose, onAprobado }) => {
         ...form,
         fecha_entrega: fechaEntregaISO,
       });
-      if (onAprobado) onAprobado();
+      if (onAprobado)
+        onAprobado("Solicitud aprobada y pedido creado correctamente.");
       onClose();
     } catch (err) {
       alert("Error al aprobar y crear el pedido");

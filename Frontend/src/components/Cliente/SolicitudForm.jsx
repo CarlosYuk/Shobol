@@ -12,6 +12,8 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
   const [loading, setLoading] = useState(false);
   const [latitud, setLatitud] = useState(null);
   const [longitud, setLongitud] = useState(null);
+  const [mensaje, setMensaje] = useState(null);
+  const [mensajeTipo, setMensajeTipo] = useState("success"); // "success" o "error"
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyClTNi7CRWB1KBn-YJXDjUFjAOYq6evRDY", // Reemplaza con tu API KEY
@@ -25,17 +27,6 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log({
-      cliente_id: clienteId,
-      nombreCliente,
-      apellido,
-      nombreEmpresa,
-      lugar_entrega: lugarEntrega,
-      numero_viajes: Number(numeroViajes),
-      observaciones,
-      latitud,
-      longitud,
-    });
     try {
       await ApiService.createSolicitud({
         cliente_id: clienteId,
@@ -56,12 +47,15 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
       setObservaciones("");
       setLatitud(null);
       setLongitud(null);
+      setMensaje("¡Solicitud registrada correctamente!");
+      setMensajeTipo("success");
       if (onSolicitudCreada) onSolicitudCreada();
-      alert("Solicitud registrada correctamente");
     } catch (error) {
-      alert("Error al registrar la solicitud");
+      setMensaje("Error al registrar la solicitud. Por favor, intente nuevamente.");
+      setMensajeTipo("error");
     }
     setLoading(false);
+    setTimeout(() => setMensaje(null), 4000); // Oculta el mensaje después de 4 segundos
   };
 
   return (
@@ -72,6 +66,28 @@ const SolicitudForm = ({ clienteId, onSolicitudCreada }) => {
       <h3 className="text-2xl font-bold mb-4 text-emerald-700 text-center">
         Registrar nueva solicitud
       </h3>
+      {mensaje && (
+        <div
+          className={`flex items-center gap-2 mb-4 px-4 py-3 rounded-lg shadow-sm font-semibold transition-all duration-300 ${
+            mensajeTipo === "success"
+              ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+              : "bg-red-100 text-red-800 border border-red-300"
+          }`}
+        >
+          {mensajeTipo === "success" ? (
+            <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" strokeWidth="2" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" />
+            </svg>
+          ) : (
+            <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" strokeWidth="2" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 9l-6 6M9 9l6 6" />
+            </svg>
+          )}
+          <span>{mensaje}</span>
+        </div>
+      )}
       <input
         type="text"
         placeholder="Nombre"

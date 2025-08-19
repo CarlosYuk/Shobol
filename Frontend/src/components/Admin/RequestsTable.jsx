@@ -3,6 +3,18 @@ import ApiService from "../../services/api";
 import { aceptarSolicitud, rechazarSolicitud } from "../../services/api";
 import AprobarPedidoModal from "./AprobarPedidoModal";
 
+const estadoColor = {
+  aprobada: "bg-emerald-100 text-emerald-800",
+  rechazada: "bg-red-100 text-red-800",
+  pendiente: "bg-yellow-100 text-yellow-800",
+};
+
+const estadoTexto = {
+  aprobada: "Aprobada",
+  rechazada: "Rechazada",
+  pendiente: "Pendiente",
+};
+
 const RequestsTable = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,6 +24,11 @@ const RequestsTable = () => {
   const [solicitudARechazar, setSolicitudARechazar] = useState(null);
   const [motivoRechazo, setMotivoRechazo] = useState("");
   const [mensaje, setMensaje] = useState(null);
+
+  const mensajeEstilo = (tipo) =>
+    tipo === "exito"
+      ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+      : "bg-red-100 text-red-800 border border-red-300";
 
   const cargarSolicitudes = async () => {
     setLoading(true);
@@ -27,6 +44,12 @@ const RequestsTable = () => {
   useEffect(() => {
     cargarSolicitudes();
   }, []);
+
+  // División de solicitudes
+  const solicitudesPendientes = solicitudes.filter((s) => s.estado === "pendiente");
+  const solicitudesProcesadas = solicitudes.filter(
+    (s) => s.estado === "aprobada" || s.estado === "rechazada"
+  );
 
   const aprobarSolicitud = async (solicitud) => {
     try {
@@ -50,104 +73,129 @@ const RequestsTable = () => {
 
   const handleAceptar = async (solicitud) => {
     try {
-      await aceptarSolicitud(solicitud.id);
-      setMensaje({ tipo: "exito", texto: "Solicitud aceptada correctamente." });
+      await aprobarSolicitud(solicitud);
+      setMensaje("Solicitud aprobada correctamente.");
       cargarSolicitudes();
-    } catch {
-      setMensaje({ tipo: "error", texto: "Error al aceptar la solicitud." });
+    } catch (error) {
+      setMensaje("Error al aprobar la solicitud.");
     }
-    setTimeout(() => setMensaje(null), 3000);
   };
 
   const handleRechazar = async () => {
-    if (!motivoRechazo.trim()) {
-      setMensaje({ tipo: "error", texto: "Debe ingresar un motivo." });
-      return;
-    }
     try {
-      await rechazarSolicitud(solicitudARechazar.id, motivoRechazo);
-      setMensaje({
-        tipo: "exito",
-        texto: "Solicitud rechazada correctamente.",
-      });
+      await rechazarSolicitud(solicitudARechazar, motivoRechazo);
+      setMensaje("Solicitud rechazada correctamente.");
       setSolicitudARechazar(null);
       setMotivoRechazo("");
       cargarSolicitudes();
-    } catch {
-      setMensaje({ tipo: "error", texto: "Error al rechazar la solicitud." });
+    } catch (error) {
+      setMensaje("Error al rechazar la solicitud.");
     }
-    setTimeout(() => setMensaje(null), 3000);
   };
 
   if (loading) return <div className="p-8">Cargando solicitudes...</div>;
 
   return (
     <div className="p-8">
-      <h2 className="text-2xl font-bold mb-6">Solicitudes Pendientes</h2>
       {mensaje && (
         <div
-          className={`mb-4 p-2 rounded ${
-            mensaje.tipo === "exito"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
+          className={`flex items-center gap-2 mb-4 px-4 py-3 rounded-lg shadow-sm font-semibold transition-all duration-300 ${mensajeEstilo(
+            mensaje.tipo || "exito"
+          )}`}
         >
-          {mensaje.texto}
+          {mensaje.tipo === "exito" ? (
+            <svg
+              className="h-5 w-5 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="10" strokeWidth="2" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="h-5 w-5 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="10" strokeWidth="2" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 9l-6 6M9 9l6 6"
+              />
+            </svg>
+          )}
+          <span>{mensaje.texto || mensaje}</span>
         </div>
       )}
-      <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-emerald-600">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                ID
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                Cliente
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                Apellido
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                Empresa
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                Lugar Entrega
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                N° Viajes
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                Fecha
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                Estado
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                Observaciones
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
-                Acción
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {solicitudes.map((s) => (
-              <tr key={s.id}>
-                <td className="px-4 py-2">{s.id}</td>
-                <td className="px-4 py-2">{s.nombreCliente}</td>
-                <td className="px-4 py-2">{s.apellido}</td>
-                <td className="px-4 py-2">{s.nombreEmpresa}</td>
-                <td className="px-4 py-2">{s.lugar_entrega}</td>
-                <td className="px-4 py-2">{s.numero_viajes}</td>
-                <td className="px-4 py-2">
-                  {new Date(s.fecha_solicitud).toLocaleString()}
-                </td>
-                <td className="px-4 py-2 capitalize">{s.estado}</td>
-                <td className="px-4 py-2">{s.observaciones}</td>
 
-                <td className="px-4 py-2">
-                  {s.estado === "pendiente" && (
+      {/* Tabla de solicitudes pendientes */}
+      <div>
+        <h2 className="text-lg font-bold mb-4 text-blue-700 text-center">
+          Solicitudes Pendientes
+        </h2>
+        <div className="overflow-x-auto mb-10">
+          <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+            <thead>
+              <tr className="bg-blue-600 text-white rounded-t-xl">
+                <th className="px-4 py-3 text-left rounded-tl-xl">ID</th>
+                <th className="px-4 py-3 text-left">Cliente</th>
+                <th className="px-4 py-3 text-left">Apellido</th>
+                <th className="px-4 py-3 text-left">Empresa</th>
+                <th className="px-4 py-3 text-left">Lugar Entrega</th>
+                <th className="px-4 py-3 text-left">N° Viajes</th>
+                <th className="px-4 py-3 text-left">Fecha</th>
+                <th className="px-4 py-3 text-left">Estado</th>
+                <th className="px-4 py-3 text-left">Observaciones</th>
+                <th className="px-4 py-3 text-left rounded-tr-xl">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {solicitudesPendientes.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="text-center py-6 text-gray-500">
+                    No tienes solicitudes pendientes.
+                  </td>
+                </tr>
+              )}
+              {solicitudesPendientes.map((s, idx) => (
+                <tr
+                  key={s.id}
+                  className={
+                    idx % 2 === 0
+                      ? "bg-white hover:bg-gray-50"
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }
+                >
+                  <td className="border px-4 py-3">{s.id}</td>
+                  <td className="border px-4 py-3">{s.nombreCliente}</td>
+                  <td className="border px-4 py-3">{s.apellido}</td>
+                  <td className="border px-4 py-3">{s.nombreEmpresa}</td>
+                  <td className="border px-4 py-3">{s.lugar_entrega}</td>
+                  <td className="border px-4 py-3">{s.numero_viajes}</td>
+                  <td className="border px-4 py-3">
+                    {new Date(s.fecha_solicitud).toLocaleString()}
+                  </td>
+                  <td className="border px-4 py-3 capitalize">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${
+                        estadoColor[s.estado] || ""
+                      }`}
+                    >
+                      {estadoTexto[s.estado] || s.estado}
+                    </span>
+                  </td>
+                  <td className="border px-4 py-3">{s.observaciones}</td>
+                  <td className="border px-4 py-3">
                     <div className="flex flex-col gap-2">
                       <button
                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded transition mb-1"
@@ -162,18 +210,86 @@ const RequestsTable = () => {
                         Rechazar
                       </button>
                     </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {/* Tabla de solicitudes procesadas */}
+      <div>
+        <h2 className="text-lg font-bold mb-4 text-gray-700 text-center">
+          Solicitudes Procesadas
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+            <thead>
+              <tr className="bg-gray-700 text-white rounded-t-xl">
+                <th className="px-4 py-3 text-left rounded-tl-xl">ID</th>
+                <th className="px-4 py-3 text-left">Cliente</th>
+                <th className="px-4 py-3 text-left">Apellido</th>
+                <th className="px-4 py-3 text-left">Empresa</th>
+                <th className="px-4 py-3 text-left">Lugar Entrega</th>
+                <th className="px-4 py-3 text-left">N° Viajes</th>
+                <th className="px-4 py-3 text-left">Fecha</th>
+                <th className="px-4 py-3 text-left">Estado</th>
+                <th className="px-4 py-3 text-left">Observaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {solicitudesProcesadas.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="text-center py-6 text-gray-500">
+                    No tienes solicitudes procesadas.
+                  </td>
+                </tr>
+              )}
+              {solicitudesProcesadas.map((s, idx) => (
+                <tr
+                  key={s.id}
+                  className={
+                    idx % 2 === 0
+                      ? "bg-white hover:bg-gray-50"
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }
+                >
+                  <td className="border px-4 py-3">{s.id}</td>
+                  <td className="border px-4 py-3">{s.nombreCliente}</td>
+                  <td className="border px-4 py-3">{s.apellido}</td>
+                  <td className="border px-4 py-3">{s.nombreEmpresa}</td>
+                  <td className="border px-4 py-3">{s.lugar_entrega}</td>
+                  <td className="border px-4 py-3">{s.numero_viajes}</td>
+                  <td className="border px-4 py-3">
+                    {new Date(s.fecha_solicitud).toLocaleString()}
+                  </td>
+                  <td className="border px-4 py-3 capitalize">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${
+                        estadoColor[s.estado] || ""
+                      }`}
+                    >
+                      {estadoTexto[s.estado] || s.estado}
+                    </span>
+                  </td>
+                  <td className="border px-4 py-3">{s.observaciones}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {modalSolicitud && (
         <AprobarPedidoModal
           solicitud={modalSolicitud}
           onClose={() => setModalSolicitud(null)}
-          onAprobado={cargarSolicitudes}
+          onAprobado={(msg) => {
+            setMensaje(msg);
+            setModalSolicitud(null);
+            cargarSolicitudes();
+          }}
         />
       )}
 

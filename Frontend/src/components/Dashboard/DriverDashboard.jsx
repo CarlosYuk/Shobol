@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 import StatCard from "./StatCard";
-import {
-  Truck,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  MapPin,
-} from "lucide-react";
+import { Truck, Clock, CheckCircle, AlertCircle, MapPin } from "lucide-react";
 import ApiService from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -168,8 +162,12 @@ const DriverDashboard = () => {
           >
             <Truck className="h-6 w-6 text-emerald-600" />
             <div className="text-left">
-              <div className="font-medium text-stone-900">Ver Todos los Pedidos</div>
-              <div className="text-sm text-stone-500">Gestiona tus entregas</div>
+              <div className="font-medium text-stone-900">
+                Ver Todos los Pedidos
+              </div>
+              <div className="text-sm text-stone-500">
+                Gestiona tus entregas
+              </div>
             </div>
           </button>
           <button
