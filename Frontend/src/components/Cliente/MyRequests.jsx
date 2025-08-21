@@ -26,36 +26,44 @@ const MyRequests = () => {
     getSolicitudesCliente().then(setSolicitudes);
   }, []);
 
-  // Agrupa pedidos asignados y entregados
-  const pedidosAsignados = [];
-  const pedidosEntregados = [];
+  // Pedidos pendientes: solicitudes sin pedidos o pedidos en estado pendiente/asignado/aprobada
+  const pedidosPendientes = [];
+  // Pedidos concretados: pedidos entregados o cancelados/rechazados
+  const pedidosConcretados = [];
 
   solicitudes.forEach((s) => {
-    if (s.pedidos && s.pedidos.length > 0) {
+    if (!s.pedidos || s.pedidos.length === 0) {
+      // Si la solicitud está pendiente o aprobada, va en pendientes
+      if (s.estado === "pendiente" || s.estado === "aprobada") {
+        pedidosPendientes.push({ solicitud: s });
+      } else if (s.estado === "rechazada") {
+        pedidosConcretados.push({ solicitud: s });
+      }
+    } else {
       s.pedidos.forEach((pedido) => {
-        if (pedido.estado === "entregado") {
-          pedidosEntregados.push({ solicitud: s, pedido });
+        if (pedido.estado === "entregado" || pedido.estado === "rechazada") {
+          pedidosConcretados.push({ solicitud: s, pedido });
         } else {
-          pedidosAsignados.push({ solicitud: s, pedido });
+          pedidosPendientes.push({ solicitud: s, pedido });
         }
       });
     }
   });
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-6 text-emerald-700 text-center">
         Mis Solicitudes
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Pedidos Asignados */}
+        {/* Pedidos Pendientes */}
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-blue-700">
-            Pedidos Asignados
+          <h3 className="text-lg font-semibold mb-4 text-yellow-700">
+            Pedidos Pendientes
           </h3>
           <div className="overflow-x-auto rounded-lg shadow">
             <table className="min-w-full bg-white">
-              <thead className="bg-blue-600 text-white">
+              <thead className="bg-yellow-500 text-white">
                 <tr>
                   <th className="px-4 py-3 text-left">Fecha</th>
                   <th className="px-4 py-3 text-left">Estado</th>
@@ -63,16 +71,16 @@ const MyRequests = () => {
                 </tr>
               </thead>
               <tbody>
-                {pedidosAsignados.length === 0 && (
+                {pedidosPendientes.length === 0 && (
                   <tr>
                     <td colSpan={3} className="text-center py-6 text-gray-500">
-                      No tienes pedidos asignados.
+                      No tienes pedidos pendientes.
                     </td>
                   </tr>
                 )}
-                {pedidosAsignados.map(({ solicitud, pedido }, idx) => (
+                {pedidosPendientes.map(({ solicitud, pedido }, idx) => (
                   <tr
-                    key={pedido.id}
+                    key={pedido ? pedido.id : solicitud.id}
                     className={
                       idx % 2 === 0
                         ? "bg-white hover:bg-gray-50"
@@ -84,24 +92,38 @@ const MyRequests = () => {
                     </td>
                     <td className="border px-4 py-3">
                       <span
-                        className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${estadoColor[pedido.estado]}`}
+                        className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${
+                          pedido
+                            ? estadoColor[pedido.estado]
+                            : estadoColor[solicitud.estado]
+                        }`}
                       >
-                        {estadoTexto[pedido.estado] || pedido.estado}
+                        {pedido
+                          ? estadoTexto[pedido.estado] || pedido.estado
+                          : estadoTexto[solicitud.estado] || solicitud.estado}
                       </span>
                     </td>
                     <td className="border px-4 py-3">
                       <button
-                        onClick={() => setDetalle({ ...solicitud, pedido })}
-                        className="text-blue-600 hover:underline font-medium"
+                        onClick={() =>
+                          setDetalle(
+                            pedido
+                              ? { ...solicitud, pedido }
+                              : solicitud
+                          )
+                        }
+                        className="text-yellow-700 hover:underline font-medium"
                       >
                         Ver detalles
                       </button>
-                      <Link
-                        to={`/dashboard/seguimiento/${pedido.id}`}
-                        className="ml-4 text-blue-600 hover:underline font-medium"
-                      >
-                        Ver seguimiento
-                      </Link>
+                      {pedido && (
+                        <Link
+                          to={`/dashboard/seguimiento/${pedido.id}`}
+                          className="ml-4 text-blue-600 hover:underline font-medium"
+                        >
+                          Ver seguimiento
+                        </Link>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -109,10 +131,10 @@ const MyRequests = () => {
             </table>
           </div>
         </div>
-        {/* Pedidos Entregados */}
+        {/* Pedidos Concretados */}
         <div>
           <h3 className="text-lg font-semibold mb-4 text-gray-700">
-            Pedidos Entregados
+            Pedidos Concretados
           </h3>
           <div className="overflow-x-auto rounded-lg shadow">
             <table className="min-w-full bg-white">
@@ -124,16 +146,16 @@ const MyRequests = () => {
                 </tr>
               </thead>
               <tbody>
-                {pedidosEntregados.length === 0 && (
+                {pedidosConcretados.length === 0 && (
                   <tr>
                     <td colSpan={3} className="text-center py-6 text-gray-500">
-                      No tienes pedidos entregados.
+                      No tienes pedidos concretados.
                     </td>
                   </tr>
                 )}
-                {pedidosEntregados.map(({ solicitud, pedido }, idx) => (
+                {pedidosConcretados.map(({ solicitud, pedido }, idx) => (
                   <tr
-                    key={pedido.id}
+                    key={pedido ? pedido.id : solicitud.id}
                     className={
                       idx % 2 === 0
                         ? "bg-white hover:bg-gray-50"
@@ -145,14 +167,26 @@ const MyRequests = () => {
                     </td>
                     <td className="border px-4 py-3">
                       <span
-                        className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${estadoColor[pedido.estado]}`}
+                        className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${
+                          pedido
+                            ? estadoColor[pedido.estado]
+                            : estadoColor[solicitud.estado]
+                        }`}
                       >
-                        {estadoTexto[pedido.estado] || pedido.estado}
+                        {pedido
+                          ? estadoTexto[pedido.estado] || pedido.estado
+                          : estadoTexto[solicitud.estado] || solicitud.estado}
                       </span>
                     </td>
                     <td className="border px-4 py-3">
                       <button
-                        onClick={() => setDetalle({ ...solicitud, pedido })}
+                        onClick={() =>
+                          setDetalle(
+                            pedido
+                              ? { ...solicitud, pedido }
+                              : solicitud
+                          )
+                        }
                         className="text-gray-600 hover:underline font-medium"
                       >
                         Ver detalles
@@ -199,7 +233,9 @@ const MyRequests = () => {
               <div>
                 <b>Estado Solicitud:</b>{" "}
                 <span
-                  className={`inline-block px-2 py-1 rounded-full font-semibold text-sm ${estadoColor[detalle.estado]}`}
+                  className={`inline-block px-2 py-1 rounded-full font-semibold text-sm ${
+                    estadoColor[detalle.estado]
+                  }`}
                 >
                   {estadoTexto[detalle.estado] || detalle.estado}
                 </span>
@@ -285,6 +321,14 @@ const MyRequests = () => {
                   </div>
                 </div>
               </>
+            )}
+            {detalle.pedido && detalle.pedido.estado === "no_entregado" && (
+              <div className="mt-2 text-red-700 font-semibold">
+                Su pedido no fue entregado. Motivo:{" "}
+                {detalle.pedido.motivo_no_entregado || "-"}
+                <br />
+                Pronto se enviará otra unidad con su pedido.
+              </div>
             )}
           </div>
         </div>

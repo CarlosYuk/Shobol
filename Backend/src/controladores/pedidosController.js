@@ -221,6 +221,43 @@ exports.marcarPedidoEntregado = async (req, res) => {
   }
 };
 
+// Marcar pedido como no entregado
+exports.marcarPedidoNoEntregado = async (req, res) => {
+  try {
+    const pedido = await Pedido.findByPk(req.params.id, {
+      include: [
+        { model: Solicitud, as: "solicitud" }
+      ]
+    });
+    if (!pedido) return res.status(404).json({ error: "Pedido no encontrado" });
+
+    pedido.estado = "no_entregado";
+    pedido.motivo_no_entregado = req.body.motivo;
+    await pedido.save();
+
+    // Liberar vehículo si estaba asignado
+    if (pedido.vehiculo_id) {
+      const vehiculo = await Vehiculo.findByPk(pedido.vehiculo_id);
+      if (vehiculo) {
+        vehiculo.estado = "disponible";
+        await vehiculo.save();
+      }
+    }
+
+    // Notificar al cliente y al administrador (ejemplo: guardar notificación)
+    // Aquí puedes enviar email, push, etc.
+    // Ejemplo: guardar en tabla Notificaciones (si tienes una)
+    // await Notificacion.create({
+    //   usuario_id: pedido.solicitud.cliente_id,
+    //   mensaje: `Su pedido no fue entregado. Motivo: ${req.body.motivo}. Pronto se enviará otra unidad.`
+    // });
+
+    res.json({ mensaje: "Pedido marcado como no entregado", pedido });
+  } catch (error) {
+    res.status(400).json({ error: "Error al marcar como no entregado" });
+  }
+};
+
 // Obtener pedidos por chofer
 exports.obtenerPedidosPorChofer = async (req, res) => {
   try {

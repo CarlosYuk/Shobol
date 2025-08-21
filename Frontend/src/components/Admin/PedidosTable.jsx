@@ -156,7 +156,7 @@ const PedidosTable = () => {
               <tr>
                 <th className="px-4 py-3 text-left rounded-tl-xl">ID</th>
                 <th className="px-4 py-3 text-left">Cliente</th>
-                <th className="px-4 py-3 text-left">Fecha</th>
+                <th className="px-4 py-3 text-left">Fecha de entrega</th>
                 <th className="px-4 py-3 text-left">Estado</th>
                 <th className="px-4 py-3 text-left">Material</th>
                 <th className="px-4 py-3 text-left">Acción</th>
@@ -189,19 +189,29 @@ const PedidosTable = () => {
                   </td>
                   <td className="border px-4 py-3">
                     <span
-                      className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${estadoColor[p.estado]}`}
+                      className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${
+                        estadoColor[p.estado]
+                      }`}
                     >
                       {estadoTexto[p.estado] || p.estado}
                     </span>
                   </td>
                   <td className="border px-4 py-3">{p.material}</td>
                   <td className="border px-4 py-3">
-                    <button
-                      className="text-blue-600 hover:underline font-medium"
-                      onClick={() => openDetallesModal(p)}
-                    >
-                      Ver detalles
-                    </button>
+                    <div className="flex flex-col gap-2">
+                      <button
+                        className="text-blue-600 hover:underline font-medium"
+                        onClick={() => openDetallesModal(p)}
+                      >
+                        Ver detalles
+                      </button>
+                      <button
+                        className="text-emerald-600 hover:underline font-medium"
+                        onClick={() => openAsignarVehiculoModal(p.id)}
+                      >
+                        Asignar vehículo
+                      </button>
+                    </div>
                   </td>
                   <td className="border px-4 py-3">{p.vehiculo_id || "-"}</td>
                 </tr>
@@ -221,13 +231,14 @@ const PedidosTable = () => {
               <tr>
                 <th className="px-4 py-3 text-left rounded-tl-xl">Fecha</th>
                 <th className="px-4 py-3 text-left">Estado</th>
+                <th className="px-4 py-3 text-left">Motivo</th>
                 <th className="px-4 py-3 text-left">Acción</th>
               </tr>
             </thead>
             <tbody>
               {pedidosEntregados.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="text-center py-6 text-gray-500">
+                  <td colSpan={4} className="text-center py-6 text-gray-500">
                     No tienes pedidos entregados.
                   </td>
                 </tr>
@@ -248,10 +259,15 @@ const PedidosTable = () => {
                   </td>
                   <td className="border px-4 py-3">
                     <span
-                      className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${estadoColor[p.estado]}`}
+                      className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${
+                        estadoColor[p.estado]
+                      }`}
                     >
                       {estadoTexto[p.estado] || p.estado}
                     </span>
+                  </td>
+                  <td className="border px-4 py-3">
+                    {p.estado === "no_entregado" ? p.motivo_no_entregado || "-" : "-"}
                   </td>
                   <td className="border px-4 py-3">
                     <button
@@ -260,6 +276,14 @@ const PedidosTable = () => {
                     >
                       Ver detalles
                     </button>
+                    {p.estado === "no_entregado" && (
+                      <button
+                        className="text-emerald-600 hover:underline font-medium"
+                        onClick={() => openAsignarVehiculoModal(p.id)}
+                      >
+                        Reasignar pedido
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -305,31 +329,105 @@ const PedidosTable = () => {
       )}
       {showDetallesModal && pedidoDetalle && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg min-w-[350px]">
-            <h3 className="text-lg font-bold mb-4">Detalles del Pedido</h3>
-            <div className="mb-2">
-              <b>ID:</b> {pedidoDetalle.id}
-            </div>
-            <div className="mb-2">
-              <b>Solicitud:</b> {pedidoDetalle.solicitud_id}
-            </div>
-            <div className="mb-2">
-              <b>Cantidad (ton):</b> {pedidoDetalle.cantidad_toneladas}
-            </div>
-            <div className="mb-2">
-              <b>Dirección:</b> {pedidoDetalle.direccion_entrega}
-            </div>
-            <div className="mb-2">
-              <b>Fecha Entrega:</b> {pedidoDetalle.fecha_entrega}
-            </div>
-            <div className="mb-2">
-              <b>Estado:</b> {pedidoDetalle.estado}
-            </div>
-            <div className="mb-2">
-              <b>Vehículo:</b>{" "}
-              {pedidoDetalle.vehiculo
-                ? pedidoDetalle.vehiculo.numero_vehiculo
-                : "Sin asignar"}
+          <div className="bg-white p-6 rounded shadow-lg min-w-[350px] max-w-md w-full relative">
+            <button
+              onClick={() => setShowDetallesModal(false)}
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold"
+              title="Cerrar"
+            >
+              &times;
+            </button>
+            <h3 className="text-lg font-bold mb-4 text-emerald-700">
+              Detalles del Pedido
+            </h3>
+            <div className="space-y-2">
+              <div>
+                <b>ID Pedido:</b> {pedidoDetalle.id}
+              </div>
+              <div>
+                <b>Cliente:</b>{" "}
+                {pedidoDetalle.solicitud?.nombreCliente ||
+                  pedidoDetalle.cliente_nombre ||
+                  pedidoDetalle.cliente_id ||
+                  "-"}
+              </div>
+              <div>
+                <b>Empresa:</b>{" "}
+                {pedidoDetalle.solicitud?.nombreEmpresa ||
+                  pedidoDetalle.empresa_nombre ||
+                  "-"}
+              </div>
+              <div>
+                <b>Solicitud:</b> {pedidoDetalle.solicitud_id}
+              </div>
+              <div>
+                <b>Cantidad (ton):</b> {pedidoDetalle.cantidad_toneladas}
+              </div>
+              <div>
+                <b>Material:</b> {pedidoDetalle.material || "-"}
+              </div>
+              <div>
+                <b>Dirección de entrega:</b> {pedidoDetalle.direccion_entrega}
+              </div>
+              <div>
+                <b>Fecha Entrega:</b>{" "}
+                {pedidoDetalle.fecha_entrega
+                  ? new Date(pedidoDetalle.fecha_entrega).toLocaleString()
+                  : "-"}
+              </div>
+              <div>
+                <b>Estado:</b>{" "}
+                <span
+                  className={`inline-block px-2 py-1 rounded-full font-semibold text-sm ${
+                    estadoColor[pedidoDetalle.estado]
+                  }`}
+                >
+                  {estadoTexto[pedidoDetalle.estado] || pedidoDetalle.estado}
+                </span>
+              </div>
+              <div>
+                <b>Vehículo:</b>{" "}
+                {pedidoDetalle.vehiculo
+                  ? `${pedidoDetalle.vehiculo.numero_vehiculo} (${pedidoDetalle.vehiculo.placa})`
+                  : pedidoDetalle.vehiculo_id || "Sin asignar"}
+              </div>
+              {pedidoDetalle.vehiculo && (
+                <>
+                  <div>
+                    <b>Propietario:</b>{" "}
+                    {pedidoDetalle.vehiculo.nombre_propietario}
+                  </div>
+                  <div>
+                    <b>Chofer:</b> {pedidoDetalle.vehiculo.nombre_chofer}
+                  </div>
+                </>
+              )}
+              {/* Copia otros datos importantes de la solicitud si existen */}
+              {pedidoDetalle.solicitud && (
+                <>
+                  <div>
+                    <b>Observaciones:</b>{" "}
+                    {pedidoDetalle.solicitud.observaciones || "-"}
+                  </div>
+                  <div>
+                    <b>Fecha Solicitud:</b>{" "}
+                    {pedidoDetalle.solicitud.fecha_solicitud
+                      ? new Date(
+                          pedidoDetalle.solicitud.fecha_solicitud
+                        ).toLocaleString()
+                      : "-"}
+                  </div>
+                  <div>
+                    <b>Lugar de entrega:</b>{" "}
+                    {pedidoDetalle.solicitud.lugar_entrega || "-"}
+                  </div>
+                </>
+              )}
+              {pedidoDetalle.estado === "no_entregado" && (
+                <div>
+                  <b>Motivo no entregado:</b> {pedidoDetalle.motivo_no_entregado || "-"}
+                </div>
+              )}
             </div>
             <div className="flex justify-end mt-4">
               <button

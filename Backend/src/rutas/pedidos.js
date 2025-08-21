@@ -16,6 +16,9 @@ router.put("/:id/asignar-vehiculo", pedidoCtrl.asignarVehiculoAPedido);
 // Marcar pedido como entregado
 router.put("/:id/entregar", pedidoCtrl.marcarPedidoEntregado);
 
+// Marcar pedido como no entregado
+router.put("/:id/no-entregado", pedidoCtrl.marcarPedidoNoEntregado);
+
 // Eliminar un pedido
 router.delete("/:id", pedidoCtrl.eliminarPedido);
 

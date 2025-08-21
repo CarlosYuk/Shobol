@@ -54,6 +54,10 @@ const Pedido = sequelize.define(
       type: DataTypes.DOUBLE,
       allowNull: true,
     },
+    motivo_no_entregado: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     tableName: "pedidos",
