@@ -280,14 +280,13 @@ const ChoferAsignaciones = () => {
                 <tr>
                   <th className="px-2 py-2 text-left">Fecha</th>
                   <th className="px-2 py-2 text-left">Estado</th>
-                  <th className="px-2 py-2 text-left">Motivo</th>
                   <th className="px-2 py-2 text-left">Acción</th>
                 </tr>
               </thead>
               <tbody>
                 {pedidosEntregados.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="text-center py-6 text-gray-500">
+                    <td colSpan={3} className="text-center py-6 text-gray-500">
                       No tienes pedidos concretados.
                     </td>
                   </tr>
@@ -312,11 +311,6 @@ const ChoferAsignaciones = () => {
                       >
                         {estadoTexto[pedido.estado] || pedido.estado}
                       </span>
-                    </td>
-                    <td className="border px-2 py-2">
-                      {pedido.estado === "no_entregado"
-                        ? pedido.motivo_no_entregado || "-"
-                        : "-"}
                     </td>
                     <td className="border px-2 py-2">
                       <button

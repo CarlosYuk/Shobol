@@ -231,14 +231,13 @@ const PedidosTable = () => {
               <tr>
                 <th className="px-4 py-3 text-left rounded-tl-xl">Fecha</th>
                 <th className="px-4 py-3 text-left">Estado</th>
-                <th className="px-4 py-3 text-left">Motivo</th>
                 <th className="px-4 py-3 text-left">Acción</th>
               </tr>
             </thead>
             <tbody>
               {pedidosEntregados.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="text-center py-6 text-gray-500">
+                  <td colSpan={3} className="text-center py-6 text-gray-500">
                     No tienes pedidos entregados.
                   </td>
                 </tr>
@@ -265,9 +264,6 @@ const PedidosTable = () => {
                     >
                       {estadoTexto[p.estado] || p.estado}
                     </span>
-                  </td>
-                  <td className="border px-4 py-3">
-                    {p.estado === "no_entregado" ? p.motivo_no_entregado || "-" : "-"}
                   </td>
                   <td className="border px-4 py-3">
                     <button
@@ -425,7 +421,8 @@ const PedidosTable = () => {
               )}
               {pedidoDetalle.estado === "no_entregado" && (
                 <div>
-                  <b>Motivo no entregado:</b> {pedidoDetalle.motivo_no_entregado || "-"}
+                  <b>Motivo no entregado:</b>{" "}
+                  {pedidoDetalle.motivo_no_entregado || "-"}
                 </div>
               )}
             </div>

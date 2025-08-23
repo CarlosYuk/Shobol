@@ -5,7 +5,12 @@ const UsersTable = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [form, setForm] = useState({ usuario: "", nombre: "", correo: "", rol: "cliente" });
+  const [form, setForm] = useState({
+    usuario: "",
+    nombre: "",
+    correo: "",
+    rol: "cliente",
+  });
 
   useEffect(() => {
     ApiService.getUsers()
@@ -80,11 +85,21 @@ const UsersTable = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-emerald-600">
             <tr>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">Usuario</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">Nombre</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">Correo</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">Rol</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">Acciones</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                Usuario
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                Nombre
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                Correo
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                Rol
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-white uppercase">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -122,7 +137,9 @@ const UsersTable = () => {
             className="bg-white p-8 rounded-lg shadow-lg min-w-[320px]"
             onSubmit={handleFormSubmit}
           >
-            <h3 className="text-lg font-bold mb-4">{editingUser ? "Editar Usuario" : "Crear Usuario"}</h3>
+            <h3 className="text-lg font-bold mb-4">
+              {editingUser ? "Editar Usuario" : "Crear Usuario"}
+            </h3>
             <input
               name="usuario"
               placeholder="Usuario"
