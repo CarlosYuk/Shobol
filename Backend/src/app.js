@@ -41,6 +41,7 @@ app.use("/api/pedidos", pedidosRoutes);
 app.use("/api/choferes", choferRoutes);
 app.use("/api/ubicaciones", ubicacionesRoutes);
 app.use("/api/mensajes", mensajesRoutes);
+app.use("/api/usuarios", require("./rutas/usuarios"));
 
 const PUERTO = process.env.PUERTO || 3000;
 

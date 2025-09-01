@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Usuario = require("../modelos/Usuario");
+const authControlador = require("../controladores/authControlador");
 
 // Obtener todos los usuarios
 router.get("/usuarios", async (req, res) => {
@@ -46,5 +47,7 @@ router.delete("/usuarios/:id", async (req, res) => {
     res.status(500).json({ error: "Error al eliminar usuario" });
   }
 });
+
+router.get("/clientes/buscar", authControlador.buscarClientesPorNombre);
 
 module.exports = router;

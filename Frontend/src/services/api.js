@@ -175,6 +175,16 @@ class ApiService {
   async getVehiculosDisponibles() {
     return this.get("/vehiculos/disponibles");
   }
+
+  async getEnviosPorCliente(clienteId) {
+    return this.get(`/pedidos/envios/cliente/${clienteId}`);
+  }
+
+  async buscarClientesPorNombre(nombre) {
+    return this.get(
+      `/usuarios/clientes/buscar?nombre=${encodeURIComponent(nombre)}`
+    );
+  }
 }
 
 export default new ApiService();

@@ -8,6 +8,7 @@ import {
   TrendingUp,
   AlertCircle,
 } from "lucide-react";
+import DashboardEnviosCliente from "../Admin/DashboardEnviosCliente";
 
 const AdminDashboard = () => {
   const [mensajes, setMensajes] = useState([]);
@@ -206,18 +207,11 @@ const AdminDashboard = () => {
         <h2 className="text-lg font-semibold text-stone-900 mb-4">
           Notificaciones
         </h2>
-        <div className="space-y-3">
-          {mensajes.filter((m) => !m.leido).map((m) => (
-            <div
-              key={m.id}
-              className="flex items-center justify-between p-3 bg-amber-100 rounded-lg"
-            >
-              <span className="text-sm text-stone-900">{m.texto}</span>
-              <span className="text-xs text-stone-400">{m.fecha}</span>
-            </div>
-          ))}
-        </div>
+        {/* ...notificaciones... */}
       </div>
+
+      {/* Envíos por cliente */}
+      <DashboardEnviosCliente />
     </div>
   );
 };

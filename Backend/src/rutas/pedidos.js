@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pedidoCtrl = require("../controladores/pedidosController");
+const enviosController = require("../controladores/enviosController");
 const { verificarToken } = require("../middleware/authMiddleware");
 
 // Obtener el pedido activo del chofer autenticado (¡debe ir antes de /:id!)
@@ -30,5 +31,12 @@ router.get("/:id", pedidoCtrl.obtenerPedidoPorId);
 
 // Obtener pedidos por chofer ID
 router.get("/chofer/:chofer_id", pedidoCtrl.obtenerPedidosPorChofer);
+
+// Obtener envíos por cliente ID
+router.get(
+  "/envios/cliente/:id",
+  verificarToken,
+  enviosController.enviosPorCliente
+);
 
 module.exports = router;

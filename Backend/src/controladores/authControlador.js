@@ -1,7 +1,7 @@
 const Usuario = require("../modelos/Usuario");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { Sequelize } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 // Registrar usuario (puedes enviar el rol desde el frontend si lo deseas)
@@ -127,4 +127,21 @@ exports.restablecerContrasena = async (req, res) => {
   await usuario.save();
 
   res.json({ mensaje: "Contraseña restablecida" });
+};
+
+// Buscar clientes por nombre (para el panel admin/gestor)
+exports.buscarClientesPorNombre = async (req, res) => {
+  try {
+    const nombre = req.query.nombre || "";
+    const clientes = await Usuario.findAll({
+      where: {
+        rol: "cliente",
+        nombre: { [Op.iLike]: `%${nombre}%` },
+      },
+      attributes: ["id", "nombre", "correo"],
+    });
+    res.json(clientes);
+  } catch (error) {
+    res.status(500).json({ error: "No se pudo buscar clientes" });
+  }
 };

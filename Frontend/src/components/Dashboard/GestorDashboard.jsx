@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Route, Truck, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import StatCard from './StatCard.jsx';
+import DashboardEnviosCliente from "../Admin/DashboardEnviosCliente";
 
 const GestorDashboard = () => {
   const [stats, setStats] = useState({
@@ -73,6 +74,9 @@ const GestorDashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Envíos por cliente */}
+      <DashboardEnviosCliente />
     </div>
   );
 };
