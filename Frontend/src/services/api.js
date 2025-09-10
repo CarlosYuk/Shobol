@@ -176,8 +176,13 @@ class ApiService {
     return this.get("/vehiculos/disponibles");
   }
 
+  
   async getEnviosPorCliente(clienteId) {
     return this.get(`/pedidos/envios/cliente/${clienteId}`);
+  }
+
+  async getEnviosPorClientePorSemana(clienteId) {
+    return this.get(`/pedidos/envios/cliente/${clienteId}/semanas`);
   }
 
   async buscarClientesPorNombre(nombre) {
@@ -246,3 +251,23 @@ export const enviarUbicacion = async ({ pedido_id, lat, lng }) => {
     body: JSON.stringify({ pedido_id, lat, lng }),
   });
 };
+
+export async function getUsuarios() {
+  const res = await fetch(`${API_BASE_URL}/usuarios/usuarios`);
+  return res.json();
+}
+
+export async function getVehiculos() {
+  const res = await fetch(`${API_BASE_URL}/vehiculos`);
+  return res.json();
+}
+
+export async function getPedidos() {
+  const res = await fetch(`${API_BASE_URL}/pedidos`);
+  return res.json();
+}
+
+export async function getRutas() {
+  const res = await fetch(`${API_BASE_URL}/rutas`);
+  return res.json();
+}

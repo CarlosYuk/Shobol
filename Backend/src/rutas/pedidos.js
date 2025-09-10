@@ -34,9 +34,9 @@ router.get("/chofer/:chofer_id", pedidoCtrl.obtenerPedidosPorChofer);
 
 // Obtener envíos por cliente ID
 router.get(
-  "/envios/cliente/:id",
+  "/envios/cliente/:id/semanas",
   verificarToken,
-  enviosController.enviosPorCliente
+  enviosController.enviosPorClientePorSemana
 );
 
 module.exports = router;

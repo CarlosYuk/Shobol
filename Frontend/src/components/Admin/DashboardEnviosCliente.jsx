@@ -6,6 +6,7 @@ const DashboardEnviosCliente = () => {
   const [clientes, setClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
   const [info, setInfo] = useState(null);
+  const [pedidosPorSemana, setPedidosPorSemana] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const buscarClientes = async () => {
@@ -25,10 +26,25 @@ const DashboardEnviosCliente = () => {
     try {
       const data = await ApiService.getEnviosPorCliente(clienteId);
       setInfo(data);
+      setPedidosPorSemana(null);
       setClienteSeleccionado(clientes.find(c => c.id === clienteId));
     } catch {
       setInfo(null);
       alert("No se pudo obtener la información del cliente");
+    }
+    setLoading(false);
+  };
+
+  const buscarEnviosPorSemana = async (clienteId) => {
+    setLoading(true);
+    try {
+      const data = await ApiService.getEnviosPorClientePorSemana(clienteId);
+      setPedidosPorSemana(data);
+      setInfo(null);
+      setClienteSeleccionado(clientes.find(c => c.id === clienteId));
+    } catch {
+      setPedidosPorSemana(null);
+      alert("No se pudo obtener la información por semanas");
     }
     setLoading(false);
   };
@@ -64,6 +80,12 @@ const DashboardEnviosCliente = () => {
                   onClick={() => buscarEnvios(c.id)}
                 >
                   {c.nombre} ({c.correo})
+                </button>
+                <button
+                  className="ml-2 text-emerald-700 hover:underline"
+                  onClick={() => buscarEnviosPorSemana(c.id)}
+                >
+                  Ver por semanas
                 </button>
               </li>
             ))}
@@ -104,6 +126,42 @@ const DashboardEnviosCliente = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      {pedidosPorSemana && (
+        <div className="bg-white rounded shadow p-4 mt-4">
+          <h3 className="font-bold mb-2">
+            Pedidos por semana para {pedidosPorSemana.cliente?.nombre}
+          </h3>
+          {Object.entries(pedidosPorSemana.semanas).map(([semana, pedidos]) => (
+            <div key={semana} className="mb-4">
+              <h4 className="font-semibold mb-2">{semana}</h4>
+              <table className="min-w-full border">
+                <thead>
+                  <tr>
+                    <th className="px-2 py-1 border">Fecha</th>
+                    <th className="px-2 py-1 border">Material</th>
+                    <th className="px-2 py-1 border">Vehículo</th>
+                    <th className="px-2 py-1 border">Placa</th>
+                    <th className="px-2 py-1 border">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pedidos.map(v => (
+                    <tr key={v.id}>
+                      <td className="border px-2 py-1">
+                        {v.fecha_entrega ? new Date(v.fecha_entrega).toLocaleString() : "-"}
+                      </td>
+                      <td className="border px-2 py-1">{v.material}</td>
+                      <td className="border px-2 py-1">{v.vehiculo?.numero_vehiculo || "-"}</td>
+                      <td className="border px-2 py-1">{v.vehiculo?.placa || "-"}</td>
+                      <td className="border px-2 py-1">{v.estado}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
         </div>
       )}
     </div>

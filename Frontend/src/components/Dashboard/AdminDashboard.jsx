@@ -1,217 +1,147 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Route, Truck, Package, AlertTriangle } from "lucide-react";
 import StatCard from "./StatCard";
-import {
-  Users,
-  Truck,
-  Route,
-  Package,
-  TrendingUp,
-  AlertCircle,
-} from "lucide-react";
 import DashboardEnviosCliente from "../Admin/DashboardEnviosCliente";
 
 const AdminDashboard = () => {
+  const [stats, setStats] = useState({
+    rutas: 0,
+    vehiculos: 0,
+    pedidos: 0,
+    mantenimiento: 0,
+  });
   const [mensajes, setMensajes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/mensajes")
-      .then((res) => res.json())
-      .then(setMensajes);
+    const fetchData = async () => {
+      setLoading(true);
+      const [rutas, vehiculos, pedidos, mensajes] = await Promise.all([
+        fetch("http://localhost:5000/api/rutas").then((res) => res.json()),
+        fetch("http://localhost:5000/api/vehiculos").then((res) => res.json()),
+        fetch("http://localhost:5000/api/pedidos").then((res) => res.json()),
+        fetch("http://localhost:5000/api/mensajes").then((res) => res.json()),
+      ]);
+      setStats({
+        rutas: rutas.length,
+        vehiculos: vehiculos.filter((v) => v.estado === "disponible").length,
+        pedidos: pedidos.length,
+        mantenimiento: vehiculos.filter((v) => v.estado === "mantenimiento")
+          .length,
+      });
+      setMensajes(mensajes);
+      setLoading(false);
+    };
+    fetchData();
   }, []);
 
-  const stats = [
+  // Eliminar notificación y actualizar lista desde backend
+  const eliminarNotificacion = async (id) => {
+    try {
+      await fetch(`http://localhost:5000/api/mensajes/${id}`, {
+        method: "DELETE",
+      });
+      // Vuelve a consultar los mensajes para reflejar el cambio real
+      const mensajesActualizados = await fetch(
+        "http://localhost:5000/api/mensajes"
+      ).then((res) => res.json());
+      setMensajes(mensajesActualizados);
+    } catch {
+      alert("No se pudo eliminar la notificación.");
+    }
+  };
+
+  if (loading) return <div className="p-8 text-center">Cargando...</div>;
+
+  const statCards = [
     {
-      title: "Total Usuarios",
-      value: 245,
-      icon: Users,
+      title: "Rutas activas",
+      value: stats.rutas,
+      icon: Route,
       color: "emerald",
-      trend: { value: 12, isPositive: true },
     },
     {
-      title: "Vehículos Activos",
-      value: 38,
+      title: "Vehículos disponibles",
+      value: stats.vehiculos,
       icon: Truck,
       color: "lime",
-      trend: { value: 5, isPositive: true },
     },
     {
-      title: "Rutas Operativas",
-      value: 15,
-      icon: Route,
-      color: "teal",
-      trend: { value: 0, isPositive: true },
-    },
-    {
-      title: "Envíos del Mes",
-      value: 1247,
+      title: "Pedidos totales",
+      value: stats.pedidos,
       icon: Package,
       color: "amber",
-      trend: { value: 18, isPositive: true },
-    },
-  ];
-
-  const recentActivities = [
-    {
-      id: 1,
-      action: "Nueva ruta creada",
-      details: "Ruta Lima - Arequipa",
-      time: "2 min ago",
-      type: "success",
     },
     {
-      id: 2,
-      action: "Vehículo en mantenimiento",
-      details: "TRK-001 fuera de servicio",
-      time: "15 min ago",
-      type: "warning",
+      title: "En mantenimiento",
+      value: stats.mantenimiento,
+      icon: AlertTriangle,
+      color: "red",
     },
-    {
-      id: 3,
-      action: "Usuario registrado",
-      details: "Cliente: Cementos del Norte S.A.",
-      time: "1 hora ago",
-      type: "info",
-    },
-    {
-      id: 4,
-      action: "Envío completado",
-      details: "ENV-2024-001 entregado",
-      time: "2 horas ago",
-      type: "success",
-    },
-  ];
-
-  const pendingTasks = [
-    { id: 1, task: "Revisar solicitud de nueva ruta", priority: "high" },
-    {
-      id: 2,
-      task: "Aprobar mantenimiento de vehículo TRK-005",
-      priority: "medium",
-    },
-    { id: 3, task: "Actualizar tarifas de transporte", priority: "low" },
-    { id: 4, task: "Revisar reportes mensuales", priority: "medium" },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-stone-900">
+        <h1 className="text-2xl font-bold text-stone-900 mb-2">
           Dashboard Administrativo
         </h1>
         <p className="text-stone-600">
-          Resumen general del sistema de transporte
+          Control y monitoreo de rutas, vehículos y pedidos
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}
       </div>
 
-      {/* Charts and Activities */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activities */}
-        <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-stone-900">
-              Actividad Reciente
-            </h3>
-            <TrendingUp className="h-5 w-5 text-stone-400" />
-          </div>
-          <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-center space-x-3">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    activity.type === "success"
-                      ? "bg-emerald-500"
-                      : activity.type === "warning"
-                      ? "bg-amber-500"
-                      : "bg-blue-500"
-                  }`}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-stone-900">
-                    {activity.action}
-                  </p>
-                  <p className="text-sm text-stone-500">{activity.details}</p>
-                </div>
-                <span className="text-xs text-stone-400">{activity.time}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Pending Tasks */}
-        <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-stone-900">
-              Tareas Pendientes
-            </h3>
-            <AlertCircle className="h-5 w-5 text-stone-400" />
-          </div>
-          <div className="space-y-3">
-            {pendingTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center justify-between p-3 bg-stone-50 rounded-lg"
-              >
-                <span className="text-sm text-stone-900">{task.task}</span>
-                <span
-                  className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    task.priority === "high"
-                      ? "bg-red-100 text-red-800"
-                      : task.priority === "medium"
-                      ? "bg-amber-100 text-amber-800"
-                      : "bg-emerald-100 text-emerald-800"
-                  }`}
-                >
-                  {task.priority === "high"
-                    ? "Alta"
-                    : task.priority === "medium"
-                    ? "Media"
-                    : "Baja"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Performance Overview */}
-      <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
-        <h3 className="text-lg font-semibold text-stone-900 mb-4">
-          Resumen de Rendimiento
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-emerald-600">98.5%</div>
-            <div className="text-sm text-stone-600">Entregas a Tiempo</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-lime-600">87%</div>
-            <div className="text-sm text-stone-600">Utilización de Flota</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-amber-600">4.8/5</div>
-            <div className="text-sm text-stone-600">Satisfacción Cliente</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Notifications */}
-      <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
-        <h2 className="text-lg font-semibold text-stone-900 mb-4">
-          Notificaciones
-        </h2>
-        {/* ...notificaciones... */}
-      </div>
-
       {/* Envíos por cliente */}
       <DashboardEnviosCliente />
+
+      {/* Notificaciones - al final y mejor ordenadas */}
+      <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 mt-8">
+        <h3 className="text-lg font-semibold text-stone-900 mb-4">
+          Notificaciones recientes
+        </h3>
+        <div className="space-y-4">
+          {mensajes
+            .filter((m) => !m.leido)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map((m) => (
+              <div
+                key={m.id}
+                className="bg-amber-100 p-4 rounded-lg flex flex-col md:flex-row md:items-center md:justify-between"
+              >
+                <div>
+                  <p className="text-sm text-amber-900">
+                    {m.texto || m.mensaje}
+                  </p>
+                  <span className="text-xs text-stone-400 block">
+                    {new Date(m.createdAt).toLocaleString()}
+                  </span>
+                  <span className="text-xs text-stone-700 block">
+                    Nombre: {m.nombre}
+                  </span>
+                  <span className="text-xs text-stone-700 block">
+                    Correo: {m.email}
+                  </span>
+                </div>
+                <button
+                  className="mt-2 md:mt-0 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs"
+                  onClick={() => eliminarNotificacion(m.id)}
+                >
+                  Eliminar
+                </button>
+              </div>
+            ))}
+          {mensajes.filter((m) => !m.leido).length === 0 && (
+            <div className="text-stone-500">Sin notificaciones nuevas.</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
