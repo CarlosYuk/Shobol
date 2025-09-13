@@ -7,7 +7,10 @@ const Vehiculo = require("../modelos/Vehiculo"); // <-- Agrega esta línea
 router.get("/", vehiculoControlador.obtenerVehiculos);
 
 // Obtener unidades disponibles (nueva ruta)
-router.get("/unidades-disponibles", vehiculoControlador.obtenerUnidadesDisponibles);
+router.get(
+  "/unidades-disponibles",
+  vehiculoControlador.obtenerUnidadesDisponibles
+);
 
 // Ruta para crear vehículo
 router.post("/", vehiculoControlador.crear);
@@ -21,12 +24,15 @@ router.put("/:id/estado", async (req, res) => {
     const id = req.params.id;
     const { estado } = req.body;
     const vehiculo = await Vehiculo.findByPk(id);
-    if (!vehiculo) return res.status(404).json({ error: "Vehículo no encontrado" });
+    if (!vehiculo)
+      return res.status(404).json({ error: "Vehículo no encontrado" });
     vehiculo.estado = estado;
     await vehiculo.save();
     res.json(vehiculo);
   } catch (error) {
-    res.status(500).json({ error: "Error al actualizar el estado del vehículo" });
+    res
+      .status(500)
+      .json({ error: "Error al actualizar el estado del vehículo" });
   }
 });
 

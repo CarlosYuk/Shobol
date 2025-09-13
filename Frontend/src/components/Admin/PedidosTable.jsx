@@ -387,17 +387,7 @@ const PedidosTable = () => {
                   ? `${pedidoDetalle.vehiculo.numero_vehiculo} (${pedidoDetalle.vehiculo.placa})`
                   : pedidoDetalle.vehiculo_id || "Sin asignar"}
               </div>
-              {pedidoDetalle.vehiculo && (
-                <>
-                  <div>
-                    <b>Propietario:</b>{" "}
-                    {pedidoDetalle.vehiculo.nombre_propietario}
-                  </div>
-                  <div>
-                    <b>Chofer:</b> {pedidoDetalle.vehiculo.nombre_chofer}
-                  </div>
-                </>
-              )}
+              {pedidoDetalle.vehiculo && <></>}
               {/* Copia otros datos importantes de la solicitud si existen */}
               {pedidoDetalle.solicitud && (
                 <>

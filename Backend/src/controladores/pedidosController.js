@@ -1,12 +1,25 @@
 const Pedido = require("../modelos/Pedido");
 const Solicitud = require("../modelos/Solicitud");
 const Vehiculo = require("../modelos/Vehiculo");
+const Chofer = require("../modelos/Chofer");
 
 // Obtener todos los pedidos
 exports.obtenerPedidos = async (req, res) => {
   try {
     const pedidos = await Pedido.findAll({
       include: [
+        {
+          model: Solicitud,
+          as: "solicitud",
+          attributes: [
+            "nombreCliente",
+            "apellido",
+            "nombreEmpresa",
+            "lugar_entrega",
+            "fecha_solicitud",
+            "observaciones",
+          ],
+        },
         {
           model: Vehiculo,
           as: "vehiculo",
@@ -53,8 +66,8 @@ exports.crearPedido = async (req, res) => {
       solicitud_id: solicitud.id,
       cliente_id: solicitud.cliente_id,
       direccion_entrega: solicitud.lugar_entrega,
-      latitud_entrega: solicitud.latitud,      // <-- CORRECTO
-      longitud_entrega: solicitud.longitud,    // <-- CORRECTO
+      latitud_entrega: solicitud.latitud, // <-- CORRECTO
+      longitud_entrega: solicitud.longitud, // <-- CORRECTO
     });
 
     res.status(201).json(nuevoPedido);
@@ -225,9 +238,7 @@ exports.marcarPedidoEntregado = async (req, res) => {
 exports.marcarPedidoNoEntregado = async (req, res) => {
   try {
     const pedido = await Pedido.findByPk(req.params.id, {
-      include: [
-        { model: Solicitud, as: "solicitud" }
-      ]
+      include: [{ model: Solicitud, as: "solicitud" }],
     });
     if (!pedido) return res.status(404).json({ error: "Pedido no encontrado" });
 
